@@ -4,7 +4,7 @@ import {
   Text,
   View,
   Image,
-  ImageBackground,
+  ScrollView,
   TextInput,
 } from "react-native";
 import {
@@ -14,12 +14,20 @@ import {
   MagnifyingGlassIcon,
 } from "react-native-heroicons/outline";
 import tailwind from "tailwind-react-native-classnames";
+import RestaurantItem from "../components/RestaurantItem";
 import Screen from "../components/Screen";
+//import colors from "../configs/colors";
 
 const HomeScreen = () => {
+    const [restaurantData, setRestaurantData] = React.useState([] as any[]);
+  const [search, setSearch] = React.useState("");
+  const [filteredDataSource, setFilteredDataSource] = React.useState([] as any[]);
+  const [masterDataSource, setMasterDataSource] = React.useState([] as any[]);
+  const [activeTab, setActiveTab] = React.useState("Delivery");
+  const [loading, setLoading] = React.useState(false);
   return (
-    <SafeAreaView style={tailwind`bg-white pt-5`}>
-      <Text style={tailwind`text-red-500`}>
+    <Screen style={tailwind`pt-5`}>
+      <View style={tailwind`text-red-500`}>
         {/* header*/}
         <View style={tailwind`flex-row pb-3 items-center mx-4 space-x-2 px-4`}>
           <Image
@@ -52,8 +60,21 @@ const HomeScreen = () => {
           </View>
           <AdjustmentsVerticalIcon color="#004AAD" />
         </View>
-      </Text>
-    </SafeAreaView>
+      </View>
+
+      <ScrollView style={tailwind`flex-1`} showsVerticalScrollIndicator={false}>
+        {loading && (
+          <ActivityIndicator
+            size="large"
+            color={colors.primary}
+            style={tailwind`mt-2 mb-6`}
+          />
+        )}
+        <RestaurantItem restaurantData={filteredDataSource} />
+      </ScrollView>
+
+
+    </Screen>
   );
 };
 
