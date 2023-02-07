@@ -8,6 +8,8 @@ import { useNavigation } from "@react-navigation/native";
 const RestaurantItem = ({ restaurantData } : { restaurantData :any } ) => {
   const navigation = useNavigation<any>();
 
+  console.log("foods", restaurantData)
+
   const handlePress = (item : any) => {
     navigation.navigate("DetailsScreen", {
       item: item,

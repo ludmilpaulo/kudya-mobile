@@ -6,6 +6,7 @@ import {
   Image,
   ScrollView,
   TextInput,
+  ActivityIndicator,
 } from "react-native";
 import {
   ChevronDownIcon,
@@ -16,20 +17,47 @@ import {
 import tailwind from "tailwind-react-native-classnames";
 import RestaurantItem from "../components/RestaurantItem";
 import Screen from "../components/Screen";
-//import colors from "../configs/colors";
+import colors from "../configs/colors";
 
 const HomeScreen = () => {
-    const [restaurantData, setRestaurantData] = React.useState([] as any[]);
+  const [restaurantData, setRestaurantData] = React.useState([] as any[]);
   const [search, setSearch] = React.useState("");
   const [filteredDataSource, setFilteredDataSource] = React.useState([] as any[]);
   const [masterDataSource, setMasterDataSource] = React.useState([] as any[]);
   const [activeTab, setActiveTab] = React.useState("Delivery");
   const [loading, setLoading] = React.useState(false);
+
+
+  React.useEffect(() => {
+    getRestaurant();
+  }, [])
+
+  const getRestaurant = async () => {
+    try {
+      fetch("https://www.sunshinedeliver.com/api/customer/restaurants/")
+        .then((response) => response.json())
+        .then((responseJson) => {
+          setRestaurantData(responseJson.restaurants);
+          setFilteredDataSource(responseJson.restaurants);
+          setMasterDataSource(responseJson.restaurants);
+        })
+        .catch(function(error) {
+          console.log('There has been a problem with your fetch operation: ' + error.message);
+          // ADD THIS THROW error
+           throw error;
+        });
+    } catch (e) {
+      alert(e);
+    }
+  };
+
+
+
   return (
     <Screen style={tailwind`pt-5`}>
       <View style={tailwind`text-red-500`}>
         {/* header*/}
-        <View style={tailwind`flex-row pb-3 items-center mx-4 space-x-2 px-4`}>
+        <View style={tailwind`flex-row pb-3 items-center mx-4 px-4`}>
           <Image
             source={{
               uri: "https://links.papareact.com/wru",
@@ -50,19 +78,20 @@ const HomeScreen = () => {
           <UserIcon size={35} color="#004AAD" />
         </View>
         {/**Search */}
-        <View style={tailwind`flex-row items-center space-x-2 pb-2 mx-4 px-4`}>
-          <View style={tailwind`flex-row flex-1 space-x-2 bg-gray-200 p-3`}>
+        <View style={tailwind`flex-row items-center pb-2 mx-4 px-4`}>
+          <View style={tailwind`rounded-full flex-row flex-1 bg-gray-100 p-3`}>
             <MagnifyingGlassIcon color="#004AAD" size={20} />
             <TextInput
               placeholder="Restaurantes e cozinhas"
               keyboardType="default"
+              
             />
           </View>
           <AdjustmentsVerticalIcon color="#004AAD" />
         </View>
       </View>
 
-      <ScrollView style={tailwind`flex-1`} showsVerticalScrollIndicator={false}>
+      <ScrollView  showsVerticalScrollIndicator={false}>
         {loading && (
           <ActivityIndicator
             size="large"
@@ -72,7 +101,6 @@ const HomeScreen = () => {
         )}
         <RestaurantItem restaurantData={filteredDataSource} />
       </ScrollView>
-
 
     </Screen>
   );
