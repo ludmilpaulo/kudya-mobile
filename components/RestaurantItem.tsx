@@ -5,12 +5,20 @@ import { Entypo } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 
-const RestaurantItem = ({ restaurantData } : { restaurantData :any } ) => {
+interface Restaurant {
+  id: number;
+  name: string;
+  phone: number;
+  address: string;
+  logo: string;
+}
+
+const RestaurantItem = ({restaurantData } : Restaurant) => {
   const navigation = useNavigation<any>();
 
-  console.log("foods", restaurantData)
+  
 
-  const handlePress = (item : any) => {
+  const handlePress = (item : Restaurant) => {
     navigation.navigate("DetailsScreen", {
       item: item,
       name: item.name,
