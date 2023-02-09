@@ -8,12 +8,6 @@ import {
   TextInput,
   ActivityIndicator,
 } from "react-native";
-import {
-  ChevronDownIcon,
-  UserIcon,
-  AdjustmentsVerticalIcon,
-  MagnifyingGlassIcon,
-} from "react-native-heroicons/outline";
 import tailwind from "tailwind-react-native-classnames";
 import RestaurantItem from "../components/RestaurantItem";
 import Screen from "../components/Screen";
@@ -71,23 +65,23 @@ const HomeScreen = () => {
             </Text>
             <Text style={tailwind`font-bold text-xl`}>
               Current Location
-              <ChevronDownIcon size={20} color="#004AAD" />
+            
             </Text>
           </View>
+          </View>
 
-          <UserIcon size={35} color="#004AAD" />
-        </View>
+         
         {/**Search */}
         <View style={tailwind`flex-row items-center pb-2 mx-4 px-4`}>
           <View style={tailwind`rounded-full flex-row flex-1 bg-gray-100 p-3`}>
-            <MagnifyingGlassIcon color="#004AAD" size={20} />
+          
             <TextInput
               placeholder="Restaurantes e cozinhas"
               keyboardType="default"
               
             />
           </View>
-          <AdjustmentsVerticalIcon color="#004AAD" />
+        
         </View>
       </View>
 
@@ -101,6 +95,7 @@ const HomeScreen = () => {
         )}
         <RestaurantItem restaurantData={filteredDataSource} />
       </ScrollView>
+     
 
     </Screen>
   );
