@@ -147,13 +147,16 @@ const DetailsScreen = (props:any) => {
               </View>
             </View>
 
-            {foods?.map((food) => {
+            {foods?.map(({ name, image, price, id, short_description }, index) => {
               return (
                 <MenuItems
-                  key={food.id}
+                  key={index}
                   resId={restaurantId}
-                  foods={foods}
-                  food={food}
+                  id={id}
+                  price={price}
+                  name={name}
+                  image={image}
+                  short_description={short_description}
                   resName={name}
                   resImage={image_url}
                 />
