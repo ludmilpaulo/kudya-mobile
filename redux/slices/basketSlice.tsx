@@ -1,6 +1,17 @@
 import { createSlice } from '@reduxjs/toolkit'
 import type { PayloadAction } from '@reduxjs/toolkit'
 
+interface Meals{
+    resId : number;
+    category: string;
+    id : number; 
+    image : string; 
+    name : string; 
+    price : number;
+    quantity : number;
+    short_description : string;
+}
+
 export interface BasketState{
 items : any
 }
@@ -18,7 +29,7 @@ export const basketSlice = createSlice({
      state.items = [...state.items, action.payload]
     },
     removeFromBasket: (state, action) => {
-      const index = state.items.findIdex((item) => item.id === action.payload.id);
+      const index = state.items.findIndex((item: { id: any; }) => item.id === action.payload.id);
 
       let newBasket = [...state.items];
 

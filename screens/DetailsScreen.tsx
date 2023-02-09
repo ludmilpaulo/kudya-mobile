@@ -95,7 +95,7 @@ const DetailsScreen = (props:any) => {
 
  useEffect(() => {
   fetchMeals();
-  },[foods]);
+  },[]);
 
   return (
     <>
