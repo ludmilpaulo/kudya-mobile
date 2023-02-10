@@ -2,7 +2,7 @@ import React, { useMemo, useState, useEffect} from 'react';
 import { View, StyleSheet, Text, Modal } from 'react-native';
 import Screen from '../components/Screen'
 import tailwind from 'tailwind-react-native-classnames';
-import AppHead from '../components/AppHead';
+
 import AppButton from '../components/AppButton'
 
 import { useSelector, useDispatch } from 'react-redux';
@@ -42,7 +42,7 @@ const CartScreen = () => {
 
     return (
         <Screen style={tailwind`flex-1 bg-white`}>
-            <AppHead title={`Your cart (${items.length})`} icon="basket-outline" />
+        
             <View style={tailwind`flex-1`}>
         
             </View>

@@ -3,7 +3,7 @@ import type { PayloadAction } from '@reduxjs/toolkit'
 
 export interface BasketState{
   
-        id: number;
+    restaurantId: number;
         name: string;
         phone: number;
         address: string;
