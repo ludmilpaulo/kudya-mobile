@@ -4,8 +4,8 @@ import restaurantReducer from "./slices/restaurantSlice"
 
 export const store = configureStore({
   reducer: {
-    basket: basketReducer,
-    restaurant: restaurantReducer,
+    basket: basketReducer
+  //  restaurant: restaurantReducer,
   },
 })
 
