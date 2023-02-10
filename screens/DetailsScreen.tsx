@@ -15,6 +15,11 @@ import { Foundation } from "@expo/vector-icons";
 import { Entypo } from "@expo/vector-icons";
 import RestaurantMap from "../components/RestaurantMap";
 import MenuItems from "../components/MenuItems";
+import {
+  selectBasketItems,
+  selectBasketTotal,
+} from "../redux/slices/basketSlice";
+import { useSelector, useDispatch } from 'react-redux';
 import ViewCart from "../components/ViewCart";
 
 
@@ -24,6 +29,7 @@ import { useRoute } from "@react-navigation/native";
 
 import * as Location from "expo-location";
 import Geocoder from "react-native-geocoding";
+import { setRestaurant } from "../redux/slices/restaurantSlice";
 
 interface Meals{
   category: string;
@@ -41,6 +47,8 @@ const DetailsScreen = (props:any) => {
   const route = useRoute();
   const item = route?.params;
 
+  const dispatch = useDispatch();
+
   const [foods, setFoods] = useState([] as Meals[]);
   const [categories, setCategories] = useState([] as Meals[]);
 
@@ -48,17 +56,22 @@ const DetailsScreen = (props:any) => {
 
  
 
-  const { restaurantId, image_url, name, address, phone, review_count } =
+  const { restaurantId, image_url, name, address, phone} =
     props.route.params;
 
   const [restAddress, setResAddress] = useState(address);
   const [restlongitude, setRestLongitude] = useState(0);
   const [restlatitude, setRestLatitude] = useState(0);
 
+  const totalPrice = useSelector(selectBasketTotal);
+  const getAllItems = useSelector(selectBasketItems);
+
   const coordinates = {
     latitude: restlatitude,
     longitude: restlongitude,
   };
+
+
 
   ///********************************* Address **************************************************/////
 
@@ -94,6 +107,10 @@ const DetailsScreen = (props:any) => {
     
 
  useEffect(() => {
+
+  dispatch(setRestaurant({ restaurantId, image_url, name, address, phone}));
+
+
   fetchMeals();
   },[]);
 
@@ -158,12 +175,13 @@ const DetailsScreen = (props:any) => {
                   image={image}
                   short_description={short_description}
                   resName={name}
-                  resImage={image_url}
-                />
+                  resImage={image_url} category={""} quantity={0}                />
               );
             })}
           </View>
         </ScrollView>
+
+        <ViewCart total={totalPrice} count={getAllItems.length} />
      
       </View>
     </>
