@@ -231,4 +231,6 @@ const styles = StyleSheet.create({
   },
 });
 
+//export const foods 
+
 export default DetailsScreen;

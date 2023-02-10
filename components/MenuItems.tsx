@@ -2,13 +2,18 @@ import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, Text, Image, TouchableOpacity } from 'react-native';
 
 import tailwind from 'tailwind-react-native-classnames';
+import BouncyCheckbox from "react-native-bouncy-checkbox";
 
 import colors from '../configs/colors';
 import { MinusCircleIcon, PlusCircleIcon } from 'react-native-heroicons/outline';
 import { useDispatch, useSelector } from 'react-redux';
-import { addToBasket, removeFromBasket, selectBasketItemsWithId, selectBasketItems } from '../redux/slices/basketSlice';
+import { addToBasket, removeFromBasket, selectBasketItemsWithId } from '../redux/slices/basketSlice';
+
+
 
 interface Meals{
+    resImage : string;
+    resName : string;
     resId : number;
     category: string;
     id : number; 
@@ -20,29 +25,33 @@ interface Meals{
 }
 
 
-const MenuItems = ({ resId, name, image, price, id, short_description}: Meals) => {
+const MenuItems = ({ resName, resImage, resId, name, image, price, id, short_description}: Meals) => {
    const [isPressed, setIsPressed ] = useState(false);
+   const [qty, setQty] = useState<number>(1);
 
-   const items = useSelector((state)=> selectBasketItemsWithId(state, id));
+
+
+
+  const items = useSelector((state) => selectBasketItemsWithId(state, id))
 
    const dispatch = useDispatch();
 
    const addItemToBasket = () =>{
 
-    dispatch(addToBasket({resId, name, image, price, id, short_description}))
+    dispatch(addToBasket({resName,resImage, name,resId, image, price, id, short_description}))
 
 
    }
 
    const removeItemFromBasket = () => {
-    console.log(id)
-   if(items.length > 0) return;
+    if(!items.length > 0) return;
 
-    dispatch(removeFromBasket({ id }));
-
+    dispatch(removeFromBasket({id}));
    }
 
-   console.log("added ",items)
+
+  
+  
 
     return (
         <>
@@ -51,9 +60,9 @@ const MenuItems = ({ resId, name, image, price, id, short_description}: Meals) =
         > 
         <View style={tailwind`mt-5 mb-12`}>
           
-                <View style={tailwind`mb-3 flex-row justify-between items-center pb-3 border-b border-gray-100`} >
+                <View style={tailwind`mb-3 flex-row justify-between items-center pb-3 border-b border-gray-100`} key={id}>
                     <View style={tailwind`flex-1 pr-3 flex-row items-center`}>
-                       
+               
                         <View style={tailwind`flex-1 pl-2`}>
                             <Text style={[tailwind`text-gray-900 font-bold mb-1`, { fontSize: 16 }]}>{name}</Text>
                             <Text style={tailwind`text-gray-800 text-xs`}>{price},Kz</Text>
@@ -69,8 +78,8 @@ const MenuItems = ({ resId, name, image, price, id, short_description}: Meals) =
             <View>
                 <View style={tailwind`flex-row items-center pb-3`} >
                     <TouchableOpacity
-                    disabled={!items.length}
-                     onPress={removeItemFromBasket}
+                   
+                   onPress={removeItemFromBasket}
                     >
                         <MinusCircleIcon size={40} color="#004AAD" />
 
@@ -78,7 +87,8 @@ const MenuItems = ({ resId, name, image, price, id, short_description}: Meals) =
                     <Text>{items.length}</Text>
 
                     <TouchableOpacity
-                    onPress={addItemToBasket}
+                     onPress={addItemToBasket}
+                       
                     >
                         <PlusCircleIcon
                         
