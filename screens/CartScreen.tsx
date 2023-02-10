@@ -1,53 +1,40 @@
-import React, { useMemo, useState, useEffect} from 'react';
+import React, { useState } from 'react';
 import { View, StyleSheet, Text, Modal } from 'react-native';
 import Screen from '../components/Screen'
 import tailwind from 'tailwind-react-native-classnames';
-
+import AppHead from '../components/AppHead';
 import AppButton from '../components/AppButton'
-
-import { useSelector, useDispatch } from 'react-redux';
+import { selectTotalItems, selectTotalPrice } from '../redux/slices/basketSlice';
+import { useSelector } from 'react-redux';
 import colors from '../configs/colors';
 import CartItems from '../components/CartItems'
 import CheckoutModal from '../components/CheckoutModal'
-import { selectRestaurant } from '../redux/slices/restaurantSlice';
-
-
-import {
-    selectBasketItems,
-    selectBasketTotal,
-  } from "../redux/slices/basketSlice";
 
 const CartScreen = () => {
-
-    const restaurant = useSelector(selectRestaurant)
-    const totalPrice = useSelector(selectBasketTotal)
-    const items = useSelector(selectBasketItems)
-
-    const [groupedItemsInBasket, setGroupedItemsInBasket] = useState([]);
-
-    const dispatch = useDispatch();
-
-    useEffect(() => {
-        const groupedItems = items.reduce((results, item) => {
-            (results[item.id] = results[item.id] || []).push(item);
-            return results;
-        }, {});
-
-        setGroupedItemsInBasket(groupedItems);
-    }, [items]);
-
-    console.log("quantity", groupedItemsInBasket)
-
+    const totalPrice = useSelector(selectTotalPrice)
+    const getAllItems = useSelector(selectTotalItems)
     const [modalVisible, setModalVisible] = useState(false)
 
     return (
         <Screen style={tailwind`flex-1 bg-white`}>
-        
+            <AppHead title={`Sua Bandeja (${getAllItems.length})`} icon="basket-outline" />
             <View style={tailwind`flex-1`}>
-        
+                <CartItems />
             </View>
-        
-            
+            {!!getAllItems.length && (
+                <View style={tailwind`flex-row items-center px-5 pb-5`}>
+                    <View style={styles.left}>
+                        <Text style={styles.total}>Total</Text>
+                        <Text style={styles.totalAmount}>{totalPrice}Kz</Text>
+                    </View>
+                    <View style={styles.right}>
+                        <AppButton title="Checkout" onPress={() => setModalVisible(true)} color="black" />
+                    </View>
+                </View>
+            )}
+            <Modal visible={modalVisible} animationType="slide" transparent={true}>
+                <CheckoutModal setModalVisible={setModalVisible} />
+            </Modal>
         </Screen>
     );
 }

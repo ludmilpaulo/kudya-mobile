@@ -1,15 +1,5 @@
 import { Alert } from 'react-native'
 
-interface Meals{
-    category: string;
-    id : number; 
-    image : string; 
-    name : string; 
-    price : number;
-    quantity : number;
-    short_description : string;
-  }
-
 
 export const getAllCartFoods = (items) => {
     let allFoods = []
@@ -30,6 +20,7 @@ export const getTotalCartItemPrice = (items) => {
             allFoods = [...allFoods, x]
         })
     })
-    return allFoods.reduce((total, item) => total + item.price, 0).toFixed(1)
+    return allFoods.reduce((total, item) => total + item.price * item.quantity, 0).toFixed(1)
 }
+
 

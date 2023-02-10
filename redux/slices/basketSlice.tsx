@@ -1,55 +1,25 @@
-import { createSlice } from '@reduxjs/toolkit'
-import type { PayloadAction } from '@reduxjs/toolkit'
+import { createSlice } from "@reduxjs/toolkit"
+import { getAllCartFoods, getTotalCartItemPrice } from "../../utils/helpers"
 
-export interface BasketState{
-items : any
-}
-
-
-const initialState: BasketState = {
+const initialState = {
   items: [],
 }
 
-export const basketSlice = createSlice({
-  name: 'basket',
+const basketSlice = createSlice({
+  name: "busket",
   initialState,
   reducers: {
-    addToBasket: (state, action) => {
-     state.items = [...state.items, action.payload]
-    },
-
-    removeFromBasket: (state, action) => {
-      console.log(action.payload, "payload remove pressed");
-      const index = state.items.findIndex(
-        (item) => item.id === action.payload.id
-        );
-
-      let newBasket = [...state.items];
-
-      if (index >=0 ){
-        newBasket.splice(index, 1);
-
-      } else{
-        console.warn(
-          `Cant remove product (id: ${action.payload.id}) as its not in basket`
-        )
-      }
-
-      state.items = newBasket;
-    },
-   
-  },
+    updateBusket: (state, action) => {
+      state.items = action.payload
+    }
+  }
 })
 
-// Action creators are generated for each case reducer function
-export const { addToBasket, removeFromBasket } = basketSlice.actions
+export const { updateBusket } = basketSlice.actions
 
-export const selectBasketItems = (state: { basket: { items: any } }) => state.basket.items;
-
-export const selectBasketItemsWithId = (state: any, id: number) => state.basket.items.filter((item: { id: any }) => item.id === id)
-
-export const selectBasketTotal = (state) => state.basket.items.reduce((total, item) => total += item.price, 0)
-
+export const selectCartItems = (state: { busket: { items: any } }) => state.busket.items
+export const selectTotalPrice = (state: { busket: { items: any } }) => getTotalCartItemPrice(state.busket.items)
+export const selectTotalItems = (state: { busket: { items: any } }) => getAllCartFoods(state.busket.items)
 
 
 export default basketSlice.reducer
