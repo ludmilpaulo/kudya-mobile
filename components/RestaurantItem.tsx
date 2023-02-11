@@ -13,12 +13,10 @@ interface Restaurant {
   logo: string;
 }
 
-const RestaurantItem = ({restaurantData } : Restaurant) => {
+const RestaurantItem = ({ restaurantData }: Restaurant) => {
   const navigation = useNavigation<any>();
 
-  
-
-  const handlePress = (item : Restaurant) => {
+  const handlePress = (item: Restaurant) => {
     navigation.navigate("DetailsScreen", {
       item: item,
       name: item.name,
@@ -31,7 +29,7 @@ const RestaurantItem = ({restaurantData } : Restaurant) => {
 
   return (
     <View>
-      {restaurantData?.map((item:any, index:any) => (
+      {restaurantData?.map((item: any, index: any) => (
         <RestaurantItemCard
           key={index}
           item={item}
@@ -44,7 +42,7 @@ const RestaurantItem = ({restaurantData } : Restaurant) => {
 
 export default RestaurantItem;
 
-const RestaurantItemCard = ({ item, onPress } : { item: any, onPress:any }) => {
+const RestaurantItemCard = ({ item, onPress }: { item: any; onPress: any }) => {
   const [loved, setLoved] = useState(false);
 
   return (

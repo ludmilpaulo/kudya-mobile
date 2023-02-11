@@ -3,14 +3,19 @@ import { View, StyleSheet, Image } from "react-native";
 import MapView, { Marker } from "react-native-maps";
 import tailwind from "tailwind-react-native-classnames";
 
-
-const RestaurantMap = ({ coordinates, title } : { coordinates:any, title:any }) => {
+const RestaurantMap = ({
+  coordinates,
+  title,
+}: {
+  coordinates: any;
+  title: any;
+}) => {
   const mapRef = useRef(null);
 
   return (
     <View style={[tailwind`bg-blue-300 relative `, { height: 250 }]}>
       <MapView
-       mapType="satellite"
+        mapType="satellite"
         region={{
           ...coordinates,
           latitudeDelta: 0.005,

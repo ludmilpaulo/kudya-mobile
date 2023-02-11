@@ -28,16 +28,17 @@ interface Restaurant {
 }
 
 const HomeScreen = () => {
-    const [restaurantData, setRestaurantData] = useState<Restaurant[]>([]);
-    const [search, setSearch] = useState("");
-    const [filteredDataSource, setFilteredDataSource] = useState<Restaurant[]>([]);
-    const [masterDataSource, setMasterDataSource] = useState<Restaurant[]>([]);
-    const [loading, setLoading] = React.useState(false);
-
+  const [restaurantData, setRestaurantData] = useState<Restaurant[]>([]);
+  const [search, setSearch] = useState("");
+  const [filteredDataSource, setFilteredDataSource] = useState<Restaurant[]>(
+    []
+  );
+  const [masterDataSource, setMasterDataSource] = useState<Restaurant[]>([]);
+  const [loading, setLoading] = React.useState(false);
 
   React.useEffect(() => {
     getRestaurant();
-  }, [])
+  }, []);
 
   const getRestaurant = async () => {
     try {
@@ -48,17 +49,18 @@ const HomeScreen = () => {
           setFilteredDataSource(responseJson.restaurants);
           setMasterDataSource(responseJson.restaurants);
         })
-        .catch(function(error) {
-          console.log('There has been a problem with your fetch operation: ' + error.message);
+        .catch(function (error) {
+          console.log(
+            "There has been a problem with your fetch operation: " +
+              error.message
+          );
           // ADD THIS THROW error
-           throw error;
+          throw error;
         });
     } catch (e) {
       alert(e);
     }
   };
-
-
 
   return (
     <Screen style={tailwind`pt-5`}>
@@ -91,14 +93,13 @@ const HomeScreen = () => {
             <TextInput
               placeholder="Restaurantes e cozinhas"
               keyboardType="default"
-              
             />
           </View>
           <AdjustmentsVerticalIcon color="#004AAD" />
         </View>
       </View>
 
-      <ScrollView  showsVerticalScrollIndicator={false}>
+      <ScrollView showsVerticalScrollIndicator={false}>
         {loading && (
           <ActivityIndicator
             size="large"
@@ -108,7 +109,6 @@ const HomeScreen = () => {
         )}
         <RestaurantItem restaurantData={filteredDataSource} />
       </ScrollView>
-
     </Screen>
   );
 };

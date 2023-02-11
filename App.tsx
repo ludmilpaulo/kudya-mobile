@@ -8,9 +8,9 @@ import { store } from "./redux/store";
 export default function App() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-    <Provider store={store}>
-      <AppNavigator />
-    </Provider>
+      <Provider store={store}>
+        <AppNavigator />
+      </Provider>
     </GestureHandlerRootView>
   );
 }

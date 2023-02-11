@@ -1,15 +1,21 @@
-import React, { useContext } from "react";
+import React, { useEffect } from "react";
 import { NavigationContainer } from "@react-navigation/native";
+import { useDispatch, useSelector } from "react-redux";
+import { loginUser, logoutUser, selectUser } from "../redux/slices/authSlice";
+import AuthNavigator from "./AuthNavigator";
+
 import HomeNavigator from "./HomeNavigator";
+import { LogBox } from "react-native";
+LogBox.ignoreLogs(["new NativeEventEmitter"]);
 
 export default function AppNavigator() {
-  // Get auth state from context
+  const user = useSelector(selectUser);
 
-  // const user = useSelector(selectUser)
+  console.log("user data ", user);
 
   return (
     <NavigationContainer>
-      <HomeNavigator />
+      {user ? <HomeNavigator /> : <AuthNavigator />}
     </NavigationContainer>
   );
 }
