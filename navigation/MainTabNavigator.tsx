@@ -10,6 +10,7 @@ import { AntDesign } from "@expo/vector-icons";
 import CartScreen from "../screens/CartScreen";
 //import GroceryScreen from "../screens/GroceryScreen";
 import AccountScreen from "../screens/AccountScreen";
+import Delivery from "../screens/Delivery";
 
 const Tab = createBottomTabNavigator();
 
@@ -39,7 +40,7 @@ const MainTabNavigator = () => {
       />
       <Tab.Screen
         name="Acompanhar"
-        component={AccountScreen}
+        component={Delivery}
         options={{
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="md-car" color={color} size={size} />

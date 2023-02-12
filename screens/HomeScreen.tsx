@@ -18,6 +18,8 @@ import tailwind from "tailwind-react-native-classnames";
 import RestaurantItem from "../components/RestaurantItem";
 import Screen from "../components/Screen";
 import colors from "../configs/colors";
+import { useDispatch, useSelector } from "react-redux";
+import { selectUser } from "../redux/slices/authSlice";
 
 interface Restaurant {
   id: number;
@@ -28,15 +30,49 @@ interface Restaurant {
 }
 
 const HomeScreen = () => {
+  const user = useSelector(selectUser);
+
+  const dispatch = useDispatch();
+
+  const url = "https://www.sunshinedeliver.com";
   const [restaurantData, setRestaurantData] = useState<Restaurant[]>([]);
   const [search, setSearch] = useState("");
+  const [userPhoto, setUserPhoto] = useState("");
+  const [userId, setUserId] = useState<any>(user?.user_id);
   const [filteredDataSource, setFilteredDataSource] = useState<Restaurant[]>(
     []
   );
   const [masterDataSource, setMasterDataSource] = useState<Restaurant[]>([]);
   const [loading, setLoading] = React.useState(false);
 
+  const customer_avatar = `${userPhoto}`;
+  const customer_image = `${url}${customer_avatar}`;
+
+  const pickUser = async () => {
+    let response = await fetch(
+      "https://www.sunshinedeliver.com/api/customer/profile/",
+      {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          user_id: userId,
+        }),
+      }
+    )
+      .then((response) => response.json())
+      .then((responseJson) => {
+        setUserPhoto(responseJson.customer_detais.avatar);
+      })
+      .catch((error) => {
+        // console.error(error);
+      });
+  };
+
   React.useEffect(() => {
+    pickUser();
     getRestaurant();
   }, []);
 
@@ -68,10 +104,8 @@ const HomeScreen = () => {
         {/* header*/}
         <View style={tailwind`flex-row pb-3 items-center mx-4 px-4`}>
           <Image
-            source={{
-              uri: "https://links.papareact.com/wru",
-            }}
-            style={tailwind`h-7 w-7 bg-gray-300 p-4 rounded-full`}
+            source={{ uri: customer_image }}
+            style={tailwind`h-12 w-12 p-4 rounded-full`}
           />
 
           <View style={tailwind`flex-1`}>

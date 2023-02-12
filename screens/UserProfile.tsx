@@ -115,7 +115,7 @@ const UserProfile = () => {
     } catch (e) {
       console.log("alila", e);
       alert("O usuário não existe, inscreva-se ou tente fazer login novamente");
-      await AsyncStorage.removeItem("authUser");
+     // await AsyncStorage.removeItem("authUser");
       Updates.reloadAsync();
     }
   };

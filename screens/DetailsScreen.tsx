@@ -46,7 +46,7 @@ const DetailsScreen = (props) => {
   const { restaurantId, image_url, name, address, phone, review_count } =
     props.route.params;
 
-  const [restAddress, setResAddress] = useState(item.address);
+  const [restAddress, setResAddress] = useState(address);
   const [restlongitude, setRestLongitude] = useState(0);
   const [restlatitude, setRestLatitude] = useState(0);
 
@@ -72,7 +72,7 @@ const DetailsScreen = (props) => {
     .catch((error) => console.warn(error));
 
   useEffect(() => {
-    fetch(`https://www.sunshinedeliver.com/api/customer/meals/${item.id}/`)
+    fetch(`https://www.sunshinedeliver.com/api/customer/meals/${restaurantId}/`)
       .then((response) => response.json())
       .then((responseJson) => {
         setFoods(responseJson.meals);
