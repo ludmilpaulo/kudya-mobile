@@ -117,7 +117,7 @@ const CheckoutScreen = ({ navigation } : { navigation:any}) => {
       alert("Por favor Preencha o Endereço de Entrega");
     } else {
       let response = await fetch(
-        "https://webhook.site/251989a7-e9ef-442b-93d9-4d6847545500",
+        "https://www.sunshinedeliver.com/api/customer/order/add/",
         {
           //mode: "no-cors",
           method: "POST",

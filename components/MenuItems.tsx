@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { View, StyleSheet, Text, Image, TouchableOpacity } from "react-native";
 //import { foods } from '../data/foodsData'
 import tailwind from "tailwind-react-native-classnames";
@@ -49,18 +49,31 @@ const MenuItems = ({ resId, food, resName, resImage, foods }: Meals) => {
   const cartItems = useSelector(selectCartItems);
   const dispatch = useDispatch();
 
+
+  const showAdd = useMemo(() =>{
+    if(qty>0){
+     setIsPressed(!isPressed);
+    }
+
+  }, [])
+
   function quantityUp() {
-    // setIsPressed(!isPressed)
+    if(qty>0){
+      setIsPressed(!isPressed);
+     }
     setQty(qty + 1);
-    setIsPressed(!isPressed);
+    
   }
 
   function quantityDown() {
     if (qty != 1) {
       // setIsPressed(!isPressed);
       setQty(qty - 1);
-      setIsPressed(!isPressed);
+     // setIsPressed(!isPressed);
     }
+    if(qty>0){
+      setIsPressed(!isPressed);
+     }
   }
 
   const match = (id: any) => {
@@ -128,29 +141,7 @@ const MenuItems = ({ resId, food, resName, resImage, foods }: Meals) => {
           style={tailwind`mb-3 flex-row justify-between items-center pb-3 border-b border-gray-100`}
         >
           <View style={tailwind`flex-1 pr-3 flex-row items-center`}>
-            {isPressed && (
-              <>
-                {match(food.id) ? (
-                  <TouchableOpacity
-                    onPress={() => handleAddRemove(food.id)}
-                    style={tailwind`bg-black absolute bottom-4 self-center py-1 px-8 rounded-full z-50`}
-                  >
-                    <Text style={tailwind`text-white text-sm`}>
-                      Remover na Bandeja
-                    </Text>
-                  </TouchableOpacity>
-                ) : (
-                  <TouchableOpacity
-                    onPress={() => handleAddRemove(food.id)}
-                    style={tailwind`bg-black absolute bottom-4 self-center py-1 px-8 rounded-full z-50`}
-                  >
-                    <Text style={tailwind`text-white text-sm`}>
-                      Adicionar na Bandeja
-                    </Text>
-                  </TouchableOpacity>
-                )}
-              </>
-            )}
+           
             <View style={tailwind`flex-1 pl-2`}>
               <Text
                 style={[
@@ -167,6 +158,8 @@ const MenuItems = ({ resId, food, resName, resImage, foods }: Meals) => {
                 {food.short_description}
               </Text>
             </View>
+
+            
 
             <View
               style={{
@@ -212,6 +205,32 @@ const MenuItems = ({ resId, food, resName, resImage, foods }: Meals) => {
             />
           </View>
         </View>
+
+        {isPressed && (
+              <>
+                {match(food.id) ? (
+                  <TouchableOpacity
+                    onPress={() => handleAddRemove(food.id)}
+                    style={tailwind`bg-black absolute bottom-1 self-center py-1 px-12 rounded-full z-50`}
+                  >
+                    <Text style={tailwind`text-white text-sm`}>
+                      Remover da Bandeja
+                    </Text>
+                  </TouchableOpacity>
+                ) : (
+                  <TouchableOpacity
+                    onPress={() => handleAddRemove(food.id)}
+                    style={tailwind`bg-black absolute bottom-1 self-center py-1 px-12 rounded-full z-50`}
+                  >
+                    <Text style={tailwind`text-white text-sm`}>
+                      Adicionar na Bandeja
+                    </Text>
+                  </TouchableOpacity>
+                )}
+              </>
+            )}
+
+
       </View>
     </>
   );

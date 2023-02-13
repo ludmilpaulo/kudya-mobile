@@ -1,15 +1,30 @@
 import { View, StyleSheet, Dimensions, Platform, Image, TouchableOpacity, Text } from 'react-native';
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { useNavigation } from '@react-navigation/native';
 import Screen from '../components/Screen';
 import tailwind from 'tailwind-react-native-classnames';
 import { XCircleIcon } from 'react-native-heroicons/outline';
 import * as Progress from "react-native-progress"
 import { useDispatch, useSelector } from "react-redux";
-import MapView, { PROVIDER_GOOGLE } from 'react-native-maps';
+import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import { selectUser } from '../redux/slices/authSlice';
 
-import  MapViewDirections  from 'react-native-maps-directions';
+import * as Location from 'expo-location';
+import * as Device from 'expo-device';
+
+
+import PolylineDirection from '@react-native-maps/polyline-direction';
+
+interface LatLon {
+   latitude: number;
+   longitude: number; 
+   altitude: number;
+   heading: number; 
+   altitudeAccuracy: number; 
+   speed: number;
+    accuracy: number;
+  }
+
 
 const Delivery = () => {
 
@@ -18,33 +33,55 @@ const Delivery = () => {
     const dispatch = useDispatch();
 
   const user = useSelector(selectUser);
+  const url = "https://www.sunshinedeliver.com";
     const GOOGLE_MAPS_APIKEY = 'AIzaSyBBkDvVVuQBVSMOt8wQoc_7E-2bvDh2-nw';
 
-  const [ driverLocation, setDriverLocation ] = useState();
-  const [location, setLocation] = useState({});
+  const [ driverLocation, setDriverLocation ] = useState<LatLon[]>();
+  const [location, setLocation] = useState<LatLon[]>();
   const [errorMsg, setErrorMsg] = useState(null);
 
   const [userlongitude, setUserLongitude ] = useState(0);
   const [userlatitude, setUserLatitude ] = useState(0);
 
-  const [ destination, setDestination ] = useState();
+  const [userPhoto, setUserPhoto] = useState("");
 
-  const [driverLong, setDriverLong ] = useState(0);
-  const [driverlat, setDriverLat ] = useState(0);
+  const customer_avatar = `${userPhoto}`;
+  const customer_image = `${url}${customer_avatar}`;
+
+  const [userId, setUserId] = useState<any>(user?.user_id);
+
+  
+
+  const pickUser = async () => {
+    let response = await fetch(
+      "https://www.sunshinedeliver.com/api/customer/profile/",
+      {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          user_id: userId,
+        }),
+      }
+    )
+      .then((response) => response.json())
+      .then((responseJson) => {
+        setUserPhoto(responseJson.customer_detais.avatar);
+      })
+      .catch((error) => {
+        // console.error(error);
+      });
+  };
 
  
-  useEffect(() => {
-    const timer = setInterval(() => covertDriverLocation()
   
-      , 2000);
-    return () => clearInterval(timer);
-  },[covertDriverLocation]);
   
   
   const getDriverLocation = async () => {
     let tokenvalue = user?.token;
       let userName = user?.username;
-      setDestination(userName);
   
       let response = await fetch('https://www.sunshinedeliver.com/api/customer/driver/location/', {
             method: 'POST',
@@ -58,72 +95,56 @@ const Delivery = () => {
             })
         })
         const locationData = await response.json();
-        setDriverLocation(locationData?.location); 
+        let result = locationData?.location;
+        let blah2 = result.replace(/['']/g, '"');
+
+        setDriverLocation(JSON.parse(blah2)); 
+
+       
   }
-  
-  const initialRegion = {
-      latitude: userlatitude,                     
-      longitude: userlongitude, 
-      latitudeDelta: 0.005,
-      longitudeDelta: 0.005,
+
+
+  const userLocation = async () => {
+    if (Platform.OS === 'android' && !Device.isDevice) {
+      alert(
+        'Oops, this will not work on Snack in an Android Emulator. Try it on your device!'
+      );
+      return;
     }
-  
-    const initialCoordinate = {
-        latitude: -33.9205734,
-        longitude: 18.4864381,
-        latitudeDelta: 0.005,
-        longitudeDelta: 0.005,
-      }
+    let { status } = await Location.requestForegroundPermissionsAsync();
+    if (status !== 'granted') {
+      alert('A permissão para acessar o local foi negada');
+      return;
+    }
+
+    let location = await Location.getCurrentPositionAsync({});
+    setUserLongitude(location.coords.longitude);
+    setUserLatitude(location.coords.latitude);
+    setLocation(location?.coords);
+};
+
   
     
-      const userLocation = async () => {
-        if (Platform.OS === 'android' && !Device.isDevice) {
-          setErrorMsg(
-            'Oops, this will not work on Snack in an Android Emulator. Try it on your device!'
-          );
-          return;
-        }
-        let { status } = await Location.requestForegroundPermissionsAsync();
-        if (status !== 'granted') {
-          setErrorMsg('A permissão para acessar o local foi negada');
-          return;
-        }
   
-        let location = await Location.getCurrentPositionAsync({});
-        setUserLongitude(location.coords.longitude);
-        setUserLatitude(location.coords.latitude);
-        setLocation(location);
-  };
-  
- // useEffect(() => {
-  //  const timer = setInterval(() => getDriverLocation(), 2000);
-  //  return () => clearInterval(timer);
-//  },[getDriverLocation]);
 
-const covertDriverLocation = async () => { 
-
-    const final = driverLocation.replace(/{|},|}/g, "\n").replace(/\[|\]|"/g, "").replace(/,/g, ',\n')
-  
-    //let blah2 = driverLocation.replace(/[{}]/g, '');
-  
-    let q = driverLocation.replace(/['"]+/g, '').replace(/[{}]/g, '');
-  
-     let blah2 = driverLocation.replace(/['']/g, '"');
-  
-      //use the value variable to get the longitude and latitude values
-      let value = JSON.parse(blah2);
-        setDriverLong(value.longitude); //it prints here
-        setDriverLat(value.latitude); //it prints here   
-  
+  const initialRegion = {
+    latitude: userlatitude,                     
+    longitude: userlongitude, 
+    latitudeDelta: 0.005,
+    longitudeDelta: 0.005,
   }
+
+
+  useEffect(()=>{
+    console.log("cota", location?.latitude);
+    pickUser();
+    getDriverLocation();
+    userLocation();
+
+ 
+  }, [])
   
-  
-  
-  useEffect(() => {
-    const timer = setInterval(() => userLocation(), 2000);
-    return () => clearInterval(timer);
-  },[userLocation]);
-    
+
 
 
 
@@ -162,10 +183,60 @@ const covertDriverLocation = async () => {
         <MapView
          ///  mapType="satellite"
           provider={PROVIDER_GOOGLE}
-          region={initialCoordinate}
+          region={{
+            latitude: driverLocation?.latitude,
+            longitude: driverLocation?.longitude,
+            latitudeDelta: 0.0922,
+            longitudeDelta: 0.0421,
+          }}
           // ref={mapRef}
           style={tailwind`flex-1 -mt-10 z-0`}
+
         >
+          <PolylineDirection
+              origin={{
+                latitude: driverLocation?.latitude,
+                longitude: driverLocation?.longitude,
+                latitudeDelta: 0.0922,
+                longitudeDelta: 0.0421,
+              }}
+              destination={initialRegion}
+              apiKey={GOOGLE_MAPS_APIKEY}
+              strokeWidth={4}
+              strokeColor="#004AAD"
+            />
+
+
+{driverLocation && (
+                    <Marker
+                        coordinate={{
+                          latitude: driverLocation?.latitude,
+                          longitude: driverLocation?.longitude,
+                          latitudeDelta: 0.0922,
+                          longitudeDelta: 0.0421,
+                        }}
+                        identifier="shop"
+                        anchor={{ x: 0.5, y: 0.5 }}
+                        title={user?.username}
+                    >
+                        <Image source={{ uri: customer_image }} style={tailwind`h-12 w-12 p-4 rounded-full`} />
+                    </Marker>
+                )}
+
+{initialRegion && (
+                    <Marker
+                        coordinate={{
+                            ...initialRegion
+                        }}
+                        identifier="shop"
+                        anchor={{ x: 0.5, y: 0.5 }}
+                        title={user?.username}
+                    >
+                        <Image source={{ uri: customer_image }} style={tailwind`h-12 w-12 p-4 rounded-full`} />
+                    </Marker>
+                )}
+
+         
         
 
       </MapView>
