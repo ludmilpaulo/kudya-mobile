@@ -50,30 +50,20 @@ const MenuItems = ({ resId, food, resName, resImage, foods }: Meals) => {
   const dispatch = useDispatch();
 
 
-  const showAdd = useMemo(() =>{
-    if(qty>0){
-     setIsPressed(!isPressed);
-    }
-
-  }, [])
 
   function quantityUp() {
-    if(qty>0){
-      setIsPressed(!isPressed);
-     }
+   
     setQty(qty + 1);
     
   }
 
   function quantityDown() {
-    if (qty != 1) {
-      // setIsPressed(!isPressed);
+    if (qty != 0) {
+     
       setQty(qty - 1);
-     // setIsPressed(!isPressed);
+  
     }
-    if(qty>0){
-      setIsPressed(!isPressed);
-     }
+   
   }
 
   const match = (id: any) => {
@@ -206,7 +196,7 @@ const MenuItems = ({ resId, food, resName, resImage, foods }: Meals) => {
           </View>
         </View>
 
-        {isPressed && (
+        {qty >0 && (
               <>
                 {match(food.id) ? (
                   <TouchableOpacity

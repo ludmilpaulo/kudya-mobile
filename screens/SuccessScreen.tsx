@@ -3,12 +3,28 @@ import tailwind from "tailwind-react-native-classnames";
 import React from "react";
 import Screen from "../components/Screen";
 import * as Animatable from 'react-native-animatable';
+import {useEffect} from 'react';
+import { useNavigation } from "@react-navigation/native";
 
 const SuccessScreen = () => {
+
+  const navigation = useNavigation<any>()
+
+  useEffect(() =>{
+
+    setTimeout(() => {
+      navigation.navigate("HomeScreen");
+    }, 4000)
+
+  }, [])
   return (
-    <Screen style={tailwind`flex-1 bg-[£00CCB] justify-center items-center`}>
-      <Text>SuccessScreen</Text>
-    </Screen>
+    <>
+      <Animatable.Image
+      source={require("../assets/Lem.gif")}
+      animation="slideInUp"
+      iterationCount={1}
+      />
+    </>
   );
 };
 
