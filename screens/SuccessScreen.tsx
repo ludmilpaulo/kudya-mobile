@@ -13,8 +13,8 @@ const SuccessScreen = () => {
   useEffect(() =>{
 
     setTimeout(() => {
-      navigation.navigate("HomeScreen");
-    }, 4000)
+      navigation.navigate("Home");
+    }, 7000)
 
   }, [])
   return (

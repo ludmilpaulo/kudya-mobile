@@ -98,6 +98,29 @@ const HomeScreen = () => {
     }
   };
 
+  ///******************************Procurar************************* */
+  const searchFilterFunction = (text: any) => {
+    // Check if searched text is not blank
+    if (text) {
+      // Inserted text is not blank
+      // Filter the masterDataSource and update FilteredDataSource
+      const newData = masterDataSource.filter(function (item) {
+        // Applying filter for the inserted text in search bar
+        const itemData = item.name ? item.name.toUpperCase() : "".toUpperCase();
+        const textData = text.toUpperCase();
+        return itemData.indexOf(textData) > -1;
+      });
+      setFilteredDataSource(newData);
+      setSearch(text);
+    } else {
+      // Inserted text is blank
+      // Update FilteredDataSource with restaurantData
+      setFilteredDataSource(masterDataSource);
+      setSearch(text);
+    }
+  };
+
+
   return (
     <Screen style={tailwind`pt-5`}>
       <View style={tailwind`text-red-500`}>
@@ -125,6 +148,8 @@ const HomeScreen = () => {
           <View style={tailwind`rounded-full flex-row flex-1 bg-gray-100 p-3`}>
             <MagnifyingGlassIcon color="#004AAD" size={20} />
             <TextInput
+            onChangeText={(text) => searchFilterFunction(text)}
+            value={search}
               placeholder="Restaurantes e cozinhas"
               keyboardType="default"
             />
