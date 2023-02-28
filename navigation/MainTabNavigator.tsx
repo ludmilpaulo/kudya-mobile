@@ -11,6 +11,7 @@ import CartScreen from "../screens/CartScreen";
 //import GroceryScreen from "../screens/GroceryScreen";
 import AccountScreen from "../screens/AccountScreen";
 import Delivery from "../screens/Delivery";
+import OrderHistory from "../screens/OrderHistory";
 
 const Tab = createBottomTabNavigator();
 
@@ -58,7 +59,7 @@ const MainTabNavigator = () => {
       />
       <Tab.Screen
         name="Pedidos"
-        component={AccountScreen}
+        component={OrderHistory}
         options={{
           tabBarIcon: ({ color, size }) => (
             <Feather name="shopping-bag" color={color} size={size} />

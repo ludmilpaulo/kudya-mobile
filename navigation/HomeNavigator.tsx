@@ -6,6 +6,7 @@ import SuccessScreen from "../screens/SuccessScreen";
 import CheckoutScreen from "../screens/CheckoutScreen";
 import MainTabNavigator from "./MainTabNavigator";
 import UserProfile from "../screens/UserProfile";
+import OrderHistory from "../screens/OrderHistory";
 
 const Stack = createStackNavigator();
 
@@ -21,6 +22,7 @@ export default function HomeNavigator() {
       <Stack.Screen name="UserProfile" component={UserProfile} />
       <Stack.Screen name="SuccessScreen" component={SuccessScreen} />
       <Stack.Screen name="CheckoutScreen" component={CheckoutScreen} />
+      <Stack.Screen name="OrderHistory" component={OrderHistory} />
     </Stack.Navigator>
   );
 }
