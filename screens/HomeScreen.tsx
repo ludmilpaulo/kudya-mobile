@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import {
-  SafeAreaView,
   Text,
   View,
   Image,
@@ -35,13 +34,11 @@ const HomeScreen = () => {
   const dispatch = useDispatch();
 
   const url = "https://www.sunshinedeliver.com";
-  const [restaurantData, setRestaurantData] = useState<Restaurant[]>([]);
+ // const [restaurantData, setRestaurantData] = useState<Restaurant[]>([]);
   const [search, setSearch] = useState("");
   const [userPhoto, setUserPhoto] = useState("");
   const [userId, setUserId] = useState<any>(user?.user_id);
-  const [filteredDataSource, setFilteredDataSource] = useState<Restaurant[]>(
-    []
-  );
+  const [filteredDataSource, setFilteredDataSource] = useState<Restaurant[]>([]);
   const [masterDataSource, setMasterDataSource] = useState<Restaurant[]>([]);
   const [loading, setLoading] = React.useState(false);
 
@@ -81,9 +78,9 @@ const HomeScreen = () => {
       fetch("https://www.sunshinedeliver.com/api/customer/restaurants/")
         .then((response) => response.json())
         .then((responseJson) => {
-          setRestaurantData(responseJson.restaurants);
-          setFilteredDataSource(responseJson.restaurants);
-          setMasterDataSource(responseJson.restaurants);
+        //  setRestaurantData(responseJson?.restaurants);
+          setFilteredDataSource(responseJson?.restaurants);
+          setMasterDataSource(responseJson?.restaurants);
         })
         .catch(function (error) {
           console.log(

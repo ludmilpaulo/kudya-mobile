@@ -13,7 +13,7 @@ interface Restaurant {
   logo: string;
 }
 
-const RestaurantItem = ({ restaurantData }: Restaurant) => {
+const RestaurantItem = ({ restaurantData }: any) => {
   const navigation = useNavigation<any>();
 
   const handlePress = (item: Restaurant) => {
