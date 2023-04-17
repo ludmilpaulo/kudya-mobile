@@ -22,7 +22,7 @@ import { loginUser } from "../redux/slices/authSlice";
 
 import * as Updates from "expo-updates";
 
-export default function SignupScreen({ navigation }) {
+export default function SignupScreen() {
   const dispatch = useDispatch();
 
   const [username, setUsername] = useState("");
@@ -51,7 +51,7 @@ export default function SignupScreen({ navigation }) {
 
         return true;
       } else {
-        resp = await response.json();
+        const resp = await response.json();
         alert("" + resp.username);
       }
     } catch (e) {

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, Text } from 'react-native';
 import Screen from '../components/Screen'
 import tailwind from 'tailwind-react-native-classnames';
 import AppHead from '../components/AppHead';
@@ -19,7 +19,7 @@ const DeliveryInfo = () => {
       const navigation = useNavigation();
 
       console.log("order==>", driverData)
-
+/*
       
 const pickOrder = async() => {
     const value = await AsyncStorage.getItem('authUser');
@@ -56,9 +56,11 @@ const pickOrder = async() => {
         });
 }
 
+*/
+
 useEffect(() =>{
 
-    pickOrder();
+   // pickOrder();
   
   }, []);
   return (

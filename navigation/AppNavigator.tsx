@@ -11,7 +11,7 @@ LogBox.ignoreLogs(["new NativeEventEmitter"]);
 export default function AppNavigator() {
   const user = useSelector(selectUser);
 
-  console.log("user data ", user);
+
 
   return (
     <NavigationContainer>

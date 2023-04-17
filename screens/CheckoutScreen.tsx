@@ -179,6 +179,44 @@ const CheckoutScreen = ({ navigation } : { navigation:any}) => {
       </View>
 
       <Screen style={tailwind`flex-1`}>
+
+<GooglePlacesAutocomplete
+ placeholder="Enter location"
+ onPress={(data, details = null) => {
+   console.log("endereco",data, details);
+ }}
+ query={{
+   key: 'AIzaSyBBkDvVVuQBVSMOt8wQoc_7E-2bvDh2-nw',
+   language: 'en',
+   components: 'country:us',
+   types: ['(cities)'],
+ }}
+ styles={{
+   container: {
+     flex: 1,
+   },
+   textInput: {
+     height: 40,
+     borderWidth: 1,
+     borderColor: '#ccc',
+     borderRadius: 5,
+     paddingLeft: 10,
+     marginTop: 10,
+     marginLeft: 10,
+     marginRight: 10,
+   },
+   listView: {
+     backgroundColor: '#fff',
+     borderWidth: 1,
+     borderColor: '#ccc',
+     borderTopWidth: 0,
+     marginTop: -1,
+     marginLeft: 10,
+     marginRight: 10,
+     elevation: 1,
+   },
+ }}
+/>
       
       <TextInput
           style={tailwind`h-10 w-full bg-white rounded-full items-center justify-center border border-blue-500 `} 
