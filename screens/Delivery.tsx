@@ -6,11 +6,31 @@ import tailwind from 'tailwind-react-native-classnames';
 import { XCircleIcon } from 'react-native-heroicons/outline';
 import * as Progress from "react-native-progress"
 import { useDispatch, useSelector } from "react-redux";
-import MapView, { Marker, PROVIDER_GOOGLE , Polyline } from 'react-native-maps';
+import MapView, { Marker, PROVIDER_GOOGLE , Polyline, Region } from 'react-native-maps';
+
+import Geolocation from '@react-native-community/geolocation';
+
 import { selectUser } from '../redux/slices/authSlice';
 
 import * as Location from 'expo-location';
 import * as Device from 'expo-device';
+
+
+const API_KEY = 'AIzaSyBBkDvVVuQBVSMOt8wQoc_7E-2bvDh2-nw';
+const origin = { latitude: 37.78825, longitude: -122.4324 };
+const destination = { latitude: 37.787, longitude: -122.431 };
+
+const getDirections = async (origin: { latitude: any; longitude: any; }, destination: { latitude: any; longitude: any; }) => {
+  const apiUrl = `https://maps.googleapis.com/maps/api/directions/json?origin=${origin.latitude},${origin.longitude}&destination=${destination.latitude},${destination.longitude}&key=${API_KEY}`;
+  try {
+    const response = await fetch(apiUrl);
+    const json = await response.json();
+    const points = json.routes[0].overview_polyline.points;
+    return points;
+  } catch (error) {
+    console.error(error);
+  }
+};
 
 
 
@@ -47,27 +67,89 @@ const Delivery = () => {
   const [userId, setUserId] = useState<any>(user?.user_id);
 
   const apiKey = 'AIzaSyBBkDvVVuQBVSMOt8wQoc_7E-2bvDh2-nw';
-  const origin = '37.7749,-122.4194'; // example San Francisco coordinates
-  const destination = '40.7128,-74.0060'; // example New York City coordinates
-
-const urlTime = `https://maps.googleapis.com/maps/api/directions/json?origin=${origin}&destination=${destination}&key=${apiKey}`;
-
-useEffect(() =>{
   
-  fetch(urlTime)
-  .then(response => response.json())
-  .then(data => {
-    const travelTime = data.routes[0].legs[0].duration.text;
-    const points = data.routes[0].overview_polyline.points;
-    const decodedPoints = decodePolyline(points);
-    console.log(decodedPoints);
-    setPointsCord(decodedPoints);
-    setEstimatedTime(travelTime);
-    
-  })
-  .catch(error => console.error(error));
-  console.log('Estimated travel time:', pointsCord);
-},[pointsCord]);
+
+const origin = { latitude: 37.78825, longitude: -122.4324 };
+const destination = { latitude: 37.787, longitude: -122.431 };
+
+
+
+const [points, setPoints] = useState([]);
+
+const [currentLocation, setCurrentLocation] = useState<Region | null>(null);
+
+const userLocation = async () => {
+  if (Platform.OS === "android" && !Device.isDevice) {
+      alert(
+      "Oops, this will not work on Snack in an Android Emulator. Try it on your device!"
+    );
+    return;
+  }
+  let { status } = await Location.requestForegroundPermissionsAsync();
+  if (status !== "granted") {
+    alert("Permission to access location was denied");
+    return;
+  }
+
+  let location = await Location.getCurrentPositionAsync({});
+
+  setCurrentLocation({
+    latitude: location.coords.latitude,
+    longitude: location.coords.longitude,
+    latitudeDelta: 0.0922,
+    longitudeDelta: 0.0421,
+  });
+};
+
+
+
+  useEffect(() => {
+    getDirections(origin, destination).then((points) => {
+      return setPoints(decode(points));
+    });
+
+
+
+  }, []);
+
+  const decode = (encoded: string) => {
+    let points = [];
+    let index = 0;
+    const len = encoded.length;
+    let lat = 0;
+    let lng = 0;
+
+    while (index < len) {
+      let b;
+      let shift = 0;
+      let result = 0;
+
+      do {
+        b = encoded.charCodeAt(index++) - 63;
+        result |= (b & 0x1f) << shift;
+        shift += 5;
+      } while (b >= 0x20);
+
+      const deltaLat = (result & 1) ? ~(result >> 1) : (result >> 1);
+      lat += deltaLat;
+
+      shift = 0;
+      result = 0;
+
+      do {
+        b = encoded.charCodeAt(index++) - 63;
+        result |= (b & 0x1f) << shift;
+        shift += 5;
+      } while (b >= 0x20);
+
+      const deltaLng = (result & 1) ? ~(result >> 1) : (result >> 1);
+      lng += deltaLng;
+
+      points.push({ latitude: lat / 1e5, longitude: lng / 1e5 });
+    }
+
+    return points;
+  };
 
    
 return (
@@ -101,7 +183,32 @@ return (
             <Progress.Bar size={30} color="#004AAD" indeterminate={true} />
 
         </View>
+        <MapView
+      style={{ flex: 1 }}
+      initialRegion={currentLocation}
+      showsUserLocation={true}
+      followsUserLocation={true}
+    >
+      {currentLocation && (
+        <Marker
+          coordinate={{
+            latitude: currentLocation.latitude,
+            longitude: currentLocation.longitude,
+          }}
+          title={'Current Location'}
+        />
+      )}
 
+<Polyline
+        coordinates={points}
+        strokeColor="#000"
+        strokeWidth={2}
+      />
+      
+    </MapView>
+     
+      
+   
       
     </Screen>
   )
