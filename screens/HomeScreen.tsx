@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Text,
   View,
@@ -6,6 +6,7 @@ import {
   ScrollView,
   TextInput,
   ActivityIndicator,
+  Platform,
 } from "react-native";
 import {
   ChevronDownIcon,
@@ -19,6 +20,9 @@ import Screen from "../components/Screen";
 import colors from "../configs/colors";
 import { useDispatch, useSelector } from "react-redux";
 import { selectUser } from "../redux/slices/authSlice";
+import Geocoder from 'react-native-geocoding';
+import * as Device from "expo-device";
+import * as Location from "expo-location";
 
 interface Restaurant {
   id: number;
@@ -28,6 +32,8 @@ interface Restaurant {
   logo: string;
 }
 
+Geocoder.init('AIzaSyCOXrtozR703_CATiREMSp253JbEhng_2M');
+
 const HomeScreen = () => {
   const user = useSelector(selectUser);
 
@@ -36,6 +42,8 @@ const HomeScreen = () => {
   const url = "https://www.sunshinedeliver.com";
  // const [restaurantData, setRestaurantData] = useState<Restaurant[]>([]);
   const [search, setSearch] = useState("");
+  const [address, setAddress] = useState('');
+
   const [userPhoto, setUserPhoto] = useState("");
   const [userId, setUserId] = useState<any>(user?.user_id);
   const [filteredDataSource, setFilteredDataSource] = useState<Restaurant[]>([]);
@@ -44,6 +52,31 @@ const HomeScreen = () => {
 
   const customer_avatar = `${userPhoto}`;
   const customer_image = `${url}${customer_avatar}`;
+
+  const [currentLocation, setCurrentLocation] = useState<any>();
+
+const userLocation = async () => {
+  if (Platform.OS === "android" && !Device.isDevice) {
+      alert(
+      "Oops, this will not work on Snack in an Android Emulator. Try it on your device!"
+    );
+    return;
+  }
+  let { status } = await Location.requestForegroundPermissionsAsync();
+  if (status !== "granted") {
+    alert("Permission to access location was denied");
+    return;
+  }
+
+  let location = await Location.getCurrentPositionAsync({});
+
+  setCurrentLocation({
+    latitude: location.coords.latitude,
+    longitude: location.coords.longitude,
+    latitudeDelta: 0.005,
+    longitudeDelta: 0.005,
+  });
+};
 
   const pickUser = async () => {
     let response = await fetch(
@@ -69,6 +102,8 @@ const HomeScreen = () => {
   };
 
   React.useEffect(() => {
+  userLocation();
+
     pickUser();
     getRestaurant();
   }, []);
@@ -117,6 +152,19 @@ const HomeScreen = () => {
     }
   };
 
+  useEffect(() => {
+
+    console.log('currentlocation', currentLocation)
+    Geocoder.from("")
+      .then(response => {
+        const formattedAddress = response.results[0].formatted_address;
+        setAddress(formattedAddress);
+      })
+      .catch(error => {
+        console.log(error);
+      });
+  }, []);
+
 
   return (
     <Screen style={tailwind`pt-5`}>
@@ -133,12 +181,12 @@ const HomeScreen = () => {
               Entregue agora!
             </Text>
             <Text style={tailwind`font-bold text-xl`}>
-              Current Location
-              <ChevronDownIcon size={20} color="#004AAD" />
+             {address}
+             
             </Text>
           </View>
 
-          <UserIcon size={35} color="#004AAD" />
+          
         </View>
         {/**Search */}
         <View style={tailwind`flex-row items-center pb-2 mx-4 px-4`}>

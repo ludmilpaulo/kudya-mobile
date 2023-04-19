@@ -186,7 +186,7 @@ const CheckoutScreen = ({ navigation } : { navigation:any}) => {
    console.log("endereco",data, details);
  }}
  query={{
-   key: 'AIzaSyBBkDvVVuQBVSMOt8wQoc_7E-2bvDh2-nw',
+   key: 'AIzaSyDn1X_BlFj-57ydasP6uZK_X_WTERNJb78',
    language: 'en',
    components: 'country:us',
    types: ['(cities)'],

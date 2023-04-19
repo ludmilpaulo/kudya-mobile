@@ -8,7 +8,7 @@ import * as Progress from "react-native-progress"
 import { useDispatch, useSelector } from "react-redux";
 import MapView, { Marker, PROVIDER_GOOGLE , Polyline, Region } from 'react-native-maps';
 
-import Geolocation from '@react-native-community/geolocation';
+
 
 import { selectUser } from '../redux/slices/authSlice';
 
@@ -16,7 +16,7 @@ import * as Location from 'expo-location';
 import * as Device from 'expo-device';
 
 
-const API_KEY = 'AIzaSyBBkDvVVuQBVSMOt8wQoc_7E-2bvDh2-nw';
+const API_KEY = 'AIzaSyDn1X_BlFj-57ydasP6uZK_X_WTERNJb78';
 const origin = { latitude: 37.78825, longitude: -122.4324 };
 const destination = { latitude: 37.787, longitude: -122.431 };
 
@@ -32,6 +32,16 @@ const getDirections = async (origin: { latitude: any; longitude: any; }, destina
   }
 };
 
+interface MapViewProps {
+
+    latitude: number;
+    longitude: number;
+    latitudeDelta: number;
+    longitudeDelta: number;
+
+  // other props here
+}
+
 
 
 interface LatLon {
@@ -43,6 +53,7 @@ interface LatLon {
    speed: number;
     accuracy: number;
   }
+
 
 
 const Delivery = () => {
@@ -76,7 +87,7 @@ const destination = { latitude: 37.787, longitude: -122.431 };
 
 const [points, setPoints] = useState([]);
 
-const [currentLocation, setCurrentLocation] = useState<Region | null>(null);
+const [currentLocation, setCurrentLocation] = useState<MapViewProps | null>();
 
 const userLocation = async () => {
   if (Platform.OS === "android" && !Device.isDevice) {
@@ -96,8 +107,8 @@ const userLocation = async () => {
   setCurrentLocation({
     latitude: location.coords.latitude,
     longitude: location.coords.longitude,
-    latitudeDelta: 0.0922,
-    longitudeDelta: 0.0421,
+    latitudeDelta: 0.005,
+    longitudeDelta: 0.005,
   });
 };
 
@@ -185,7 +196,8 @@ return (
         </View>
         <MapView
       style={{ flex: 1 }}
-      initialRegion={currentLocation}
+      provider={PROVIDER_GOOGLE}
+      region={currentLocation}
       showsUserLocation={true}
       followsUserLocation={true}
     >

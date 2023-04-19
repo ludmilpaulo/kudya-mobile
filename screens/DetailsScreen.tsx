@@ -58,7 +58,7 @@ const DetailsScreen = (props) => {
   ///********************************* Address **************************************************/////
 
   // Initialize the module (needs to be done only once)
-  Geocoder.init("AIzaSyBBkDvVVuQBVSMOt8wQoc_7E-2bvDh2-nw"); // use a valid API key
+  Geocoder.init("AIzaSyDn1X_BlFj-57ydasP6uZK_X_WTERNJb78"); // use a valid API key
   // With more options
   // Geocoder.init("xxxxxxxxxxxxxxxxxxxxxxxxx", {language : "en"}); // set the language
 
