@@ -20,11 +20,13 @@ import Screen from "../components/Screen";
 import colors from "../configs/colors";
 import { useDispatch, useSelector } from "react-redux";
 import { selectUser } from "../redux/slices/authSlice";
-import Geocoder from 'react-native-geocoding';
+
 import * as Device from "expo-device";
 import * as Location from "expo-location";
+import useFetch from '../redux/useFetch'
 
 interface Restaurant {
+  restaurants: any[];
   id: number;
   name: string;
   phone: number;
@@ -32,103 +34,47 @@ interface Restaurant {
   logo: string;
 }
 
-Geocoder.init('AIzaSyCOXrtozR703_CATiREMSp253JbEhng_2M');
+
 
 const HomeScreen = () => {
   const user = useSelector(selectUser);
 
+  const params = {
+    endpoint: "/customer/restaurants/",
+    method: "GET"
+    //auth: true
+  }
+
+  const { status, data, refetch, setRefetch, address, customer_image } = useFetch(params);
+  const [refreshing, setRefreshing] = useState(false);
+
   const dispatch = useDispatch();
 
-  const url = "https://www.sunshinedeliver.com";
- // const [restaurantData, setRestaurantData] = useState<Restaurant[]>([]);
+
   const [search, setSearch] = useState("");
-  const [address, setAddress] = useState('');
+  
 
   const [userPhoto, setUserPhoto] = useState("");
   const [userId, setUserId] = useState<any>(user?.user_id);
-  const [filteredDataSource, setFilteredDataSource] = useState<Restaurant[]>([]);
-  const [masterDataSource, setMasterDataSource] = useState<Restaurant[]>([]);
+  const [filteredDataSource, setFilteredDataSource] = useState<any[]>([]);
+  const [masterDataSource, setMasterDataSource] = useState<any[]>([]);
   const [loading, setLoading] = React.useState(false);
 
-  const customer_avatar = `${userPhoto}`;
-  const customer_image = `${url}${customer_avatar}`;
+ 
 
-  const [currentLocation, setCurrentLocation] = useState<any>();
+  let userAddress = address;
 
-const userLocation = async () => {
-  if (Platform.OS === "android" && !Device.isDevice) {
-      alert(
-      "Oops, this will not work on Snack in an Android Emulator. Try it on your device!"
-    );
-    return;
-  }
-  let { status } = await Location.requestForegroundPermissionsAsync();
-  if (status !== "granted") {
-    alert("Permission to access location was denied");
-    return;
-  }
+  
 
-  let location = await Location.getCurrentPositionAsync({});
 
-  setCurrentLocation({
-    latitude: location.coords.latitude,
-    longitude: location.coords.longitude,
-    latitudeDelta: 0.005,
-    longitudeDelta: 0.005,
-  });
-};
-
-  const pickUser = async () => {
-    let response = await fetch(
-      "https://www.sunshinedeliver.com/api/customer/profile/",
-      {
-        method: "POST",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          user_id: userId,
-        }),
-      }
-    )
-      .then((response) => response.json())
-      .then((responseJson) => {
-        setUserPhoto(responseJson.customer_detais.avatar);
-      })
-      .catch((error) => {
-        // console.error(error);
-      });
-  };
 
   React.useEffect(() => {
-  userLocation();
-
-    pickUser();
-    getRestaurant();
+    console.log("isabela", data)
+    setFilteredDataSource(data?.restaurants);
+    setMasterDataSource(data?.restaurants);
+   
   }, []);
 
-  const getRestaurant = async () => {
-    try {
-      fetch("https://www.sunshinedeliver.com/api/customer/restaurants/")
-        .then((response) => response.json())
-        .then((responseJson) => {
-        //  setRestaurantData(responseJson?.restaurants);
-          setFilteredDataSource(responseJson?.restaurants);
-          setMasterDataSource(responseJson?.restaurants);
-        })
-        .catch(function (error) {
-          console.log(
-            "There has been a problem with your fetch operation: " +
-              error.message
-          );
-          // ADD THIS THROW error
-          throw error;
-        });
-    } catch (e) {
-      alert(e);
-    }
-  };
 
   ///******************************Procurar************************* */
   const searchFilterFunction = (text: any) => {
@@ -154,15 +100,8 @@ const userLocation = async () => {
 
   useEffect(() => {
 
-    console.log('currentlocation', currentLocation)
-    Geocoder.from("")
-      .then(response => {
-        const formattedAddress = response.results[0].formatted_address;
-        setAddress(formattedAddress);
-      })
-      .catch(error => {
-        console.log(error);
-      });
+    console.log('currentlocation', masterDataSource)
+    
   }, []);
 
 

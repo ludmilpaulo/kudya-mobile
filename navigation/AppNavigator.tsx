@@ -5,6 +5,7 @@ import { loginUser, logoutUser, selectUser } from "../redux/slices/authSlice";
 import AuthNavigator from "./AuthNavigator";
 
 import HomeNavigator from "./HomeNavigator";
+
 import { LogBox } from "react-native";
 LogBox.ignoreLogs(["new NativeEventEmitter"]);
 
@@ -15,7 +16,10 @@ export default function AppNavigator() {
 
   return (
     <NavigationContainer>
-      {user ? <HomeNavigator /> : <AuthNavigator />}
+      
+      {user ? <HomeNavigator /> 
+      : 
+      <AuthNavigator />}
     </NavigationContainer>
   );
 }

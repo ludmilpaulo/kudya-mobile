@@ -16,78 +16,44 @@ import * as Location from 'expo-location';
 import * as Device from 'expo-device';
 
 
-const API_KEY = 'AIzaSyDn1X_BlFj-57ydasP6uZK_X_WTERNJb78';
-const origin = { latitude: 37.78825, longitude: -122.4324 };
-const destination = { latitude: 37.787, longitude: -122.431 };
 
-const getDirections = async (origin: { latitude: any; longitude: any; }, destination: { latitude: any; longitude: any; }) => {
-  const apiUrl = `https://maps.googleapis.com/maps/api/directions/json?origin=${origin.latitude},${origin.longitude}&destination=${destination.latitude},${destination.longitude}&key=${API_KEY}`;
-  try {
-    const response = await fetch(apiUrl);
-    const json = await response.json();
-    const points = json.routes[0].overview_polyline.points;
-    return points;
-  } catch (error) {
-    console.error(error);
-  }
-};
+import axios from 'axios';
 
-interface MapViewProps {
-
-    latitude: number;
-    longitude: number;
-    latitudeDelta: number;
-    longitudeDelta: number;
-
-  // other props here
+interface LatLng {
+  latitude: number;
+  longitude: number;
 }
-
-
-
-interface LatLon {
-   latitude: number;
-   longitude: number; 
-   altitude: number;
-   heading: number; 
-   altitudeAccuracy: number; 
-   speed: number;
-    accuracy: number;
-  }
-
 
 
 const Delivery = () => {
 
     const navigation = useNavigation();
 
-    const dispatch = useDispatch();
+    const [ deliveryDuration, setDeliveryDuration ] = useState();
+    const [ deliveryPoints, setDeliveryPoints ] = useState();
 
-  const user = useSelector(selectUser);
-  const url = "https://www.sunshinedeliver.com";
-    const GOOGLE_MAPS_APIKEY = 'AIzaSyBBkDvVVuQBVSMOt8wQoc_7E-2bvDh2-nw';
 
- 
+  const getTravelTime = async (
+    origin: LatLng,
+    destination: LatLng,
+  ): Promise<number | null> => {
+    const apiKey = 'AIzaSyDn1X_BlFj-57ydasP6uZK_X_WTERNJb78';
+    const url = `https://maps.googleapis.com/maps/api/directions/json?origin=${origin.latitude},${origin.longitude}&destination=${destination.latitude},${destination.longitude}&key=${apiKey}`;
+    try {
+      const response = await axios.get(url);
+      const duration = response.data.routes[0].legs[0].duration.value;
+      const points = response.data.routes[0].overview_polyline.points;
+      setDeliveryDuration(duration);
+      setDeliveryPoints(points);
+      return duration;
+    } catch (error) {
+      console.log(error);
+      return null;
+    }
+  };
   
-  const [userPhoto, setUserPhoto] = useState("");
-
-  const [estimatedTime, setEstimatedTime] = useState('');  
-  const [ pointsCord, setPointsCord] = useState<any>();
-  const customer_avatar = `${userPhoto}`;
-  const customer_image = `${url}${customer_avatar}`;
-
-  const [userId, setUserId] = useState<any>(user?.user_id);
-
-  const apiKey = 'AIzaSyBBkDvVVuQBVSMOt8wQoc_7E-2bvDh2-nw';
-  
-
-const origin = { latitude: 37.78825, longitude: -122.4324 };
-const destination = { latitude: 37.787, longitude: -122.431 };
 
 
-
-const [points, setPoints] = useState([]);
-
-const [currentLocation, setCurrentLocation] = useState<MapViewProps | null>();
 
 const userLocation = async () => {
   if (Platform.OS === "android" && !Device.isDevice) {
@@ -104,63 +70,19 @@ const userLocation = async () => {
 
   let location = await Location.getCurrentPositionAsync({});
 
-  setCurrentLocation({
-    latitude: location.coords.latitude,
-    longitude: location.coords.longitude,
-    latitudeDelta: 0.005,
-    longitudeDelta: 0.005,
-  });
 };
 
-
+const [travelTime, setTravelTime] = useState<number | null>(null);
 
   useEffect(() => {
-    getDirections(origin, destination).then((points) => {
-      return setPoints(decode(points));
-    });
 
-
-
+    console.log("API call", deliveryDuration)
+    const origin = { latitude: 40.712776, longitude: -74.005974 }; // New York City
+    const destination = { latitude: 37.7749, longitude: -122.4194 }; // San Francisco
+    getTravelTime(origin, destination).then((time) => setTravelTime(time));
   }, []);
 
-  const decode = (encoded: string) => {
-    let points = [];
-    let index = 0;
-    const len = encoded.length;
-    let lat = 0;
-    let lng = 0;
 
-    while (index < len) {
-      let b;
-      let shift = 0;
-      let result = 0;
-
-      do {
-        b = encoded.charCodeAt(index++) - 63;
-        result |= (b & 0x1f) << shift;
-        shift += 5;
-      } while (b >= 0x20);
-
-      const deltaLat = (result & 1) ? ~(result >> 1) : (result >> 1);
-      lat += deltaLat;
-
-      shift = 0;
-      result = 0;
-
-      do {
-        b = encoded.charCodeAt(index++) - 63;
-        result |= (b & 0x1f) << shift;
-        shift += 5;
-      } while (b >= 0x20);
-
-      const deltaLng = (result & 1) ? ~(result >> 1) : (result >> 1);
-      lng += deltaLng;
-
-      points.push({ latitude: lat / 1e5, longitude: lng / 1e5 });
-    }
-
-    return points;
-  };
 
    
 return (
@@ -180,7 +102,10 @@ return (
                     <Text style={tailwind`text-lg text-gray-400`}>
                         Estimated Arrival
                     </Text>
-                    <Text style={tailwind`text-4xl font-bold`}> 45-55 Minutes {estimatedTime}</Text>
+                   
+                    {travelTime && 
+                    <Text style={tailwind`text-4xl font-bold`}>Travel time: {Math.round(travelTime / 60)} minutes</Text>}
+                    
                 </View>
                 <Image
                 source={{
@@ -194,40 +119,15 @@ return (
             <Progress.Bar size={30} color="#004AAD" indeterminate={true} />
 
         </View>
-        <MapView
-      style={{ flex: 1 }}
-      provider={PROVIDER_GOOGLE}
-      region={currentLocation}
-      showsUserLocation={true}
-      followsUserLocation={true}
-    >
-      {currentLocation && (
-        <Marker
-          coordinate={{
-            latitude: currentLocation.latitude,
-            longitude: currentLocation.longitude,
-          }}
-          title={'Current Location'}
-        />
-      )}
-
-<Polyline
-        coordinates={points}
-        strokeColor="#000"
-        strokeWidth={2}
-      />
-      
-    </MapView>
-     
-      
+        
    
       
     </Screen>
   )
 }
 
-export default Delivery
-
-function decodePolyline(points: any) {
+export default Delivery;
+function setCurrentLocation(arg0: { latitude: number; longitude: number; latitudeDelta: number; longitudeDelta: number; }) {
   throw new Error('Function not implemented.');
 }
+

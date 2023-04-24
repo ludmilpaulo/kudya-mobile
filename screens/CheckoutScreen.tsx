@@ -1,13 +1,11 @@
 import React, { useEffect, useState, useRef } from "react";
 import {
   View,
-  StyleSheet,
   Image,
   TextInput,
   TouchableOpacity,
   Text,
   Platform,
-  ScrollView,
 
 } from "react-native";
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
@@ -21,11 +19,8 @@ import { selectCartItems, updateBusket } from "../redux/slices/basketSlice";
 
 
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
-import Ionicons from "react-native-vector-icons/Ionicons";
-import AntDesign from "react-native-vector-icons/AntDesign";
 
 
-import colors from "../configs/colors";
 import Screen from "../components/Screen";
 import { selectUser } from "../redux/slices/authSlice";
 
