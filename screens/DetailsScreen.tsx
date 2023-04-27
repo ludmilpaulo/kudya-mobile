@@ -29,7 +29,7 @@ import Geolocation from "react-native-geolocation-service";
 import * as Location from "expo-location";
 import Geocoder from "react-native-geocoding";
 
-const DetailsScreen = (props) => {
+const DetailsScreen = (props:any) => {
   const navigation = useNavigation();
 
   const route = useRoute();

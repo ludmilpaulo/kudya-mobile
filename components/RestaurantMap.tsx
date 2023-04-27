@@ -15,7 +15,7 @@ const RestaurantMap = ({
   return (
     <View style={[tailwind`bg-blue-300 relative `, { height: 250 }]}>
       <MapView
-        mapType="satellite"
+  
         region={{
           ...coordinates,
           latitudeDelta: 0.005,
@@ -34,7 +34,7 @@ const RestaurantMap = ({
             title={title}
           >
             <Image
-              source={require("../assets/icon.png")}
+              source={require("../assets/shop.png")}
               style={{ height: 27, width: 27 }}
             />
           </Marker>
