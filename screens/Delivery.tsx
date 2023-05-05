@@ -32,6 +32,20 @@ const Delivery = () => {
     const [ deliveryDuration, setDeliveryDuration ] = useState();
     const [ deliveryPoints, setDeliveryPoints ] = useState();
 
+    const [ driverLocation, setDriverLocation ] = useState();
+    const [location, setLocation] = useState({});
+    const [errorMsg, setErrorMsg] = useState(null);
+
+    const [userlongitude, setUserLongitude ] = useState(0);
+    const [userlatitude, setUserLatitude ] = useState(0);
+
+    const [ destination, setDestination ] = useState();
+
+    const [driverLong, setDriverLong ] = useState(0);
+    const [driverlat, setDriverLat ] = useState(0);
+
+    const user = useSelector(selectUser);
+
 
   const getTravelTime = async (
     origin: LatLng,
@@ -51,32 +65,75 @@ const Delivery = () => {
       return null;
     }
   };
+
+  const getDriverLocation = async () => {
+  
+    let userName = user.username;
+    setDestination(userName);
+
+    let response = await fetch('https://www.sunshinedeliver.com/api/customer/driver/location/', {
+          method: 'POST',
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            access_token: user?.token
+          
+          })
+      })
+      const locationData = await response.json();
+      setDriverLocation(locationData?.location); 
+}
+
+const initialRegion = {
+    latitude: userlatitude,                     
+    longitude: userlongitude, 
+    latitudeDelta: 0.005,
+    longitudeDelta: 0.005,
+  }
+
+  const initialCoordinate = {
+      latitude: driverlat,
+      longitude: driverLong,
+      latitudeDelta: 0.005,
+      longitudeDelta: 0.005,
+    }
+
+  
+    const userLocation = async () => {
+      if (Platform.OS === 'android' && !Device.isDevice) {
+        alert(
+          'Oops, this will not work on Snack in an Android Emulator. Try it on your device!'
+        );
+        return;
+      }
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        alert('A permissão para acessar o local foi negada');
+        return;
+      }
+
+      let location = await Location.getCurrentPositionAsync({});
+      setUserLongitude(location.coords.longitude);
+      setUserLatitude(location.coords.latitude);
+      setLocation(location);
+};
+
   
 
 
 
-const userLocation = async () => {
-  if (Platform.OS === "android" && !Device.isDevice) {
-      alert(
-      "Oops, this will not work on Snack in an Android Emulator. Try it on your device!"
-    );
-    return;
-  }
-  let { status } = await Location.requestForegroundPermissionsAsync();
-  if (status !== "granted") {
-    alert("Permission to access location was denied");
-    return;
-  }
 
-  let location = await Location.getCurrentPositionAsync({});
-
-};
 
 const [travelTime, setTravelTime] = useState<number | null>(null);
 
   useEffect(() => {
+    userLocation();
+    getDriverLocation();
 
-    console.log("API call", deliveryDuration)
+    console.log("API call", driverLocation)
+
     const origin = { latitude: 40.712776, longitude: -74.005974 }; // New York City
     const destination = { latitude: 37.7749, longitude: -122.4194 }; // San Francisco
     getTravelTime(origin, destination).then((time) => setTravelTime(time));
