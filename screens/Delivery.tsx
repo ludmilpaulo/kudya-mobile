@@ -84,6 +84,8 @@ const Delivery = () => {
       })
       const locationData = await response.json();
       setDriverLocation(locationData?.location); 
+
+      console.log("driver location", locationData)
 }
 
 const initialRegion = {
@@ -134,7 +136,9 @@ const [travelTime, setTravelTime] = useState<number | null>(null);
 
     console.log("API call", driverLocation)
 
-    const origin = { latitude: 40.712776, longitude: -74.005974 }; // New York City
+    const origin = driverLocation
+
+  
     const destination = { latitude: 37.7749, longitude: -122.4194 }; // San Francisco
     getTravelTime(origin, destination).then((time) => setTravelTime(time));
   }, []);
