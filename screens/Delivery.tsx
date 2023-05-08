@@ -46,6 +46,8 @@ const Delivery = () => {
 
     const user = useSelector(selectUser);
 
+    ///const myObject = JSON.parse(myString);
+
 
   const getTravelTime = async (
     origin: LatLng,
@@ -85,7 +87,10 @@ const Delivery = () => {
       const locationData = await response.json();
       setDriverLocation(locationData?.location); 
 
-      console.log("driver location", locationData)
+      console.log("driver location", JSON.parse(locationData?.location))
+
+      console.log("API call", driverLocation)
+
 }
 
 const initialRegion = {

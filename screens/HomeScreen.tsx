@@ -147,12 +147,7 @@ const HomeScreen = () => {
   };
   
 
-  useEffect(() => {
-
-    console.log('currentlocation', currentLocation)
-    
-  }, []);
-
+  
   
 
 
