@@ -77,7 +77,7 @@ const HomeScreen = () => {
 
         let location = await Location.getCurrentPositionAsync({});
        // dispatch(setLocation(location.coords))
-        console.log(location.coords)
+       // console.log(location.coords)
         setCurrentLocation(location.coords);
 
         Geocoder.from(location?.coords)

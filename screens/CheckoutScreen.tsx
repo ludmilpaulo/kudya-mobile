@@ -27,7 +27,7 @@ import { selectUser } from "../redux/slices/authSlice";
 const CheckoutScreen = ({ navigation } : { navigation:any}) => {
   const [location, setLocation] = useState({});
   const [errorMsg, setErrorMsg] = useState(null);
-  const [userAddress, setUserAddress] = useState();
+  const [userAddress, setUserAddress] = useState("");
 
   const dispatch = useDispatch();
 
@@ -177,13 +177,15 @@ const CheckoutScreen = ({ navigation } : { navigation:any}) => {
 
 <GooglePlacesAutocomplete
  placeholder="Enter location"
+ 
  onPress={(data, details = null) => {
-   console.log("endereco",data, details);
+   console.log("endereco done",data?.description);
+   setUserAddress(data?.description)
  }}
  query={{
    key: 'AIzaSyDn1X_BlFj-57ydasP6uZK_X_WTERNJb78',
    language: 'en',
-   components: 'country:us',
+
    types: ['(cities)'],
  }}
  styles={{

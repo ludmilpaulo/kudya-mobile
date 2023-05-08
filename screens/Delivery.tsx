@@ -1,12 +1,14 @@
-import { View, StyleSheet, Dimensions, Platform, Image, TouchableOpacity, Text } from 'react-native';
-import React, { useEffect, useMemo, useState } from 'react'
+import { View, StyleSheet, Dimensions, Platform, Image, TouchableOpacity, Text, Button } from 'react-native';
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigation } from '@react-navigation/native';
 import Screen from '../components/Screen';
 import tailwind from 'tailwind-react-native-classnames';
 import { XCircleIcon } from 'react-native-heroicons/outline';
 import * as Progress from "react-native-progress"
 import { useDispatch, useSelector } from "react-redux";
-import MapView, { Marker, PROVIDER_GOOGLE , Polyline, Region } from 'react-native-maps';
+import MapView, { Marker, PROVIDER_GOOGLE , Polyline, Region} from 'react-native-maps';
+import  {DirectionsService } from 'react-native-maps';
+
 
 
 
@@ -29,10 +31,12 @@ const Delivery = () => {
 
     const navigation = useNavigation();
 
+    const mapRef = useRef(null);
+
     const [ deliveryDuration, setDeliveryDuration ] = useState();
     const [ deliveryPoints, setDeliveryPoints ] = useState();
 
-    const [ driverLocation, setDriverLocation ] = useState();
+    const [ driverLocation, setDriverLocation ] = useState<any | null>();
     const [location, setLocation] = useState({});
     const [errorMsg, setErrorMsg] = useState(null);
 
@@ -41,13 +45,12 @@ const Delivery = () => {
 
     const [ destination, setDestination ] = useState();
 
-    const [driverLong, setDriverLong ] = useState(0);
-    const [driverlat, setDriverLat ] = useState(0);
+    const [driverLongitude, setDriverLong ] = useState(0);
+    const [driverLatitude, setDriverLat ] = useState(0);
 
     const user = useSelector(selectUser);
 
-    ///const myObject = JSON.parse(myString);
-
+    const GOOGLE_MAPS_APIKEY = 'AIzaSyDn1X_BlFj-57ydasP6uZK_X_WTERNJb78';
 
   const getTravelTime = async (
     origin: LatLng,
@@ -57,7 +60,7 @@ const Delivery = () => {
     const url = `https://maps.googleapis.com/maps/api/directions/json?origin=${origin.latitude},${origin.longitude}&destination=${destination.latitude},${destination.longitude}&key=${apiKey}`;
     try {
       const response = await axios.get(url);
-      const duration = response.data.routes[0].legs[0].duration.value;
+      const duration = response.data.routes[0]?.legs[0].duration.value;
       const points = response.data.routes[0].overview_polyline.points;
       setDeliveryDuration(duration);
       setDeliveryPoints(points);
@@ -87,9 +90,10 @@ const Delivery = () => {
       const locationData = await response.json();
       setDriverLocation(locationData?.location); 
 
-      console.log("driver location", JSON.parse(locationData?.location))
+    
+      console.log("driver location")
 
-      console.log("API call", driverLocation)
+      console.log("API call", response)
 
 }
 
@@ -101,8 +105,8 @@ const initialRegion = {
   }
 
   const initialCoordinate = {
-      latitude: driverlat,
-      longitude: driverLong,
+      latitude: driverLatitude,
+      longitude: driverLongitude,
       latitudeDelta: 0.005,
       longitudeDelta: 0.005,
     }
@@ -136,18 +140,62 @@ const initialRegion = {
 const [travelTime, setTravelTime] = useState<number | null>(null);
 
   useEffect(() => {
+
     userLocation();
     getDriverLocation();
 
-    console.log("API call", driverLocation)
+    covertDriverLocation();
 
-    const origin = driverLocation
+    const origin = { latitude: driverLatitude, longitude: driverLongitude }; // New York City
+
+    
+    const destination = { latitude: userlatitude, longitude: userlongitude }; // San Francisco
+    getTravelTime(origin, destination).then((time) => setTravelTime(time));
+
 
   
-    const destination = { latitude: 37.7749, longitude: -122.4194 }; // San Francisco
-    getTravelTime(origin, destination).then((time) => setTravelTime(time));
+
+    console.log("initial o", origin)
   }, []);
 
+
+  const covertDriverLocation = async () => { 
+
+    const final = driverLocation.replace(/{|},|}/g, "\n").replace(/\[|\]|"/g, "").replace(/,/g, ',\n')
+  
+    //let blah2 = driverLocation.replace(/[{}]/g, '');
+  
+    let q = driverLocation.replace(/['"]+/g, '').replace(/[{}]/g, '');
+  
+     let blah2 = driverLocation.replace(/['']/g, '"');
+  
+      //use the value variable to get the longitude and latitude values
+      let value = JSON.parse(blah2);
+        setDriverLong(value.longitude); //it prints here
+        setDriverLat(value.latitude); //it prints here   
+  
+  }
+
+  const [directionCoords, setDirectionCoords] = useState([]);
+
+  const handleGetDirections = () => {
+    const origin = { latitude: 37.78825, longitude: -122.4324 };
+    const destination = { latitude: 37.7749, longitude: -122.4194 };
+    DirectionsService.route(
+      {
+        origin,
+        destination,
+        travelMode: 'DRIVING',
+      },
+      (result, status) => {
+        if (status === 'OK') {
+          setDirectionCoords(result.routes[0].overview_path);
+        } else {
+          console.error(result);
+        }
+      }
+    );
+  };
 
 
    
@@ -168,7 +216,7 @@ return (
                     <Text style={tailwind`text-lg text-gray-400`}>
                         Estimated Arrival
                     </Text>
-                   
+                   <Text></Text>
                     {travelTime && 
                     <Text style={tailwind`text-4xl font-bold`}>Travel time: {Math.round(travelTime / 60)} minutes</Text>}
                     
@@ -184,7 +232,40 @@ return (
             </View>
             <Progress.Bar size={30} color="#004AAD" indeterminate={true} />
 
+            
+
         </View>
+        <View style={[tailwind`bg-blue-300 relative `, { height: 500 }]}>
+        <Button title="Get Directions" onPress={getTravelTime} />
+      <MapView
+
+          region={initialCoordinate}
+  
+        style={tailwind`h-full z-10`}
+      >
+        {directionCoords.length > 0 && (
+          <Polyline
+            coordinates={directionCoords}
+            strokeColor="#F00"
+            strokeWidth={3}
+          />
+        )}
+        <Marker coordinate={initialCoordinate}
+        
+         >
+           <Image
+                source={{
+                    uri: "https://links.papareact.com/fls",
+                }}
+                style={tailwind`h-20 w-20`}
+            
+                />
+          
+          </Marker>
+        <Marker coordinate={{ latitude: 37.7749, longitude: -122.4194 }} />
+      </MapView>
+      <Button title="Get Directions" onPress={handleGetDirections} />
+    </View>
         
    
       

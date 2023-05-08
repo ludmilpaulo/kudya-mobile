@@ -2284,7 +2284,7 @@
     prompts "^2.4.0"
     semver "^6.3.0"
 
-"@react-native-maps/polyline-direction@^1.0.0":
+"@react-native-maps/polyline-direction@*":
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/@react-native-maps/polyline-direction/-/polyline-direction-1.0.0.tgz#5384a8aeaa19b2effe5b572257ac511a6a7f1b11"
   integrity sha512-XlnegW6BBHHfWOOkr3SxYqqqM7gtyNkX6ICJA9q0a3FKZI4r9n2DhfQxm96Je/xTy+Nn5Xwyh+YW6U5CjJDDAw==
