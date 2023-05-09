@@ -1,7 +1,5 @@
 {
-    "gitlens.defaultDateLocale": "en-GB",
-    "cSpell.languageSettings": [
-
-    ],
-    "terminal.integrated.localEchoStyle": "dim"
+  "gitlens.defaultDateLocale": "en-GB",
+  "cSpell.languageSettings": [],
+  "terminal.integrated.localEchoStyle": "dim"
 }

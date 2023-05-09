@@ -15,7 +15,6 @@ const RestaurantMap = ({
   return (
     <View style={[tailwind`bg-blue-300 relative `, { height: 250 }]}>
       <MapView
-  
         region={{
           ...coordinates,
           latitudeDelta: 0.005,

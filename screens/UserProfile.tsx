@@ -7,7 +7,7 @@ import {
   View,
   TextInput,
   TouchableOpacity,
-  ScrollView,
+  Platform,
   Keyboard,
 } from "react-native";
 import Screen from "../components/Screen";
@@ -20,12 +20,26 @@ import { Ionicons } from "@expo/vector-icons";
 import colors from "../configs/colors";
 
 import * as ImagePicker from "expo-image-picker";
+import * as Permissions from "expo-permissions";
+import {
+  launchCamera,
+  launchImageLibrary,
+  Asset,
+} from "react-native-image-picker";
 
 import { useNavigation } from "@react-navigation/native";
 import * as Updates from "expo-updates";
 
 import { logoutUser, selectUser } from "../redux/slices/authSlice";
 import { useDispatch, useSelector } from "react-redux";
+import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
+
+type ImageInfo = {
+  uri: string;
+  width: number;
+  height: number;
+  type: string;
+};
 
 const UserProfile = () => {
   const user = useSelector(selectUser);
@@ -33,14 +47,11 @@ const UserProfile = () => {
   const dispatch = useDispatch();
 
   const [username, setUsername] = useState("");
-  const [image, setImage] = useState(null);
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
 
   const [first_name, setFirst_name] = useState("");
   const [last_name, setLast_name] = useState("");
-
-  const [photo, setPhoto] = useState(null);
 
   const [Type, setType] = useState("");
 
@@ -62,23 +73,57 @@ const UserProfile = () => {
     };
   }, []);
 
+  const [imageInfo, setImageInfo] = useState<ImageInfo | undefined>();
+
+  const handleTakePhoto = async () => {
+    const { status } = await Permissions.askAsync(Permissions.CAMERA);
+    if (status !== "granted") {
+      alert("Permission to access camera denied");
+      return;
+    }
+    const result = await ImagePicker.launchCameraAsync({
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+    if (!result.cancelled) {
+      setImageInfo(result);
+    }
+  };
+
+  const handleSelectPhoto = async () => {
+    const { status } = await Permissions.askAsync(Permissions.MEDIA_LIBRARY);
+    if (status !== "granted") {
+      alert("Permission to access media library denied");
+      return;
+    }
+    const result = await ImagePicker.launchImageLibraryAsync({
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+    });
+    if (!result.cancelled) {
+      setImageInfo(result);
+    }
+  };
+
   const userUpdate = async () => {
     // const value = await AsyncStorage.getItem("authUser");
     // const tokenData = JSON.parse(value || {});
     let tokenvalue = user?.token;
 
     // ImagePicker saves the taken photo to disk and returns a local URI to it
-    let localUri = image.uri;
-    let filename = localUri.split("/").pop();
-
-    // Infer the type of the image
-    let match = /\.(\w+)$/.exec(filename);
-    let type = match ? `image/${match[1]}` : `image`;
+    if (!imageInfo) {
+      alert("Please select an image first");
+      return;
+    }
+    const { uri, type } = imageInfo;
 
     // Upload the image using the fetch and FormData APIs
     let formData = new FormData();
     // Assume "photo" is the name of the form field the server expects
-    formData.append("avatar", { uri: localUri, name: filename, type });
+    formData.append("avatar", { uri, type, name: "image.jpg" });
     formData.append("access_token", tokenvalue);
     formData.append("address", address);
     formData.append("first_name", first_name);
@@ -115,50 +160,8 @@ const UserProfile = () => {
     } catch (e) {
       console.log("alila", e);
       alert("O usuário não existe, inscreva-se ou tente fazer login novamente");
-     // await AsyncStorage.removeItem("authUser");
+      // await AsyncStorage.removeItem("authUser");
       Updates.reloadAsync();
-    }
-  };
-
-  const pickImage = async () => {
-    // No permissions request is necessary for launching the image library
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
-    });
-
-    console.log(result);
-
-    if (!result.cancelled) {
-      setImage(result);
-      //setImage(result.uri.replace('file://', ''));
-      setType(result.uri.substring(result.uri.lastIndexOf(".") + 1));
-      setPhoto(result.uri);
-    }
-  };
-
-  const openCamera = async () => {
-    // Ask the user for the permission to access the camera
-    const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
-
-    if (permissionResult.granted === false) {
-      alert("You've refused to allow this appp to access your camera!");
-      return;
-    }
-
-    const result = await ImagePicker.launchCameraAsync();
-
-    // Explore the result
-    console.log(result);
-
-    if (!result.cancelled) {
-      setImage(result);
-      //setImage(result.uri.replace('file://', ''));
-      setType(result.uri.substring(result.uri.lastIndexOf(".") + 1));
-      setPhoto(result.uri);
-      console.log(result.uri);
     }
   };
 
@@ -168,14 +171,17 @@ const UserProfile = () => {
         <View style={styles.wrapper}>
           <View style={tailwind`justify-center items-center`}>
             <View style={tailwind`rounded-full overflow-hidden w-48 h-48 mt-4`}>
-              {photo && (
-                <Image source={{ uri: photo }} style={tailwind`w-48 h-48`} />
+              {imageInfo && (
+                <Image
+                  source={{ uri: imageInfo.uri }}
+                  style={tailwind`w-48 h-48`}
+                />
               )}
             </View>
-            <TouchableOpacity onPress={() => openCamera()}>
+            <TouchableOpacity onPress={() => handleTakePhoto()}>
               <Text style={styles.wellcomeTo}>Tire uma Foto{"\n"} ou </Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => pickImage()}>
+            <TouchableOpacity onPress={() => handleSelectPhoto()}>
               <Text style={styles.brand}>Carregue sua Foto</Text>
             </TouchableOpacity>
           </View>
@@ -208,15 +214,45 @@ const UserProfile = () => {
                 onSubmitEditing={Keyboard.dismiss}
               />
 
-              <TextInput
-                style={styles.input}
+              <GooglePlacesAutocomplete
                 placeholder="Seu Endereço"
-                autoCompleteType="off"
-                value={address}
-                onChangeText={(text) => setAddress(text)}
-                autoCapitalize={"none"}
-                onSubmitEditing={Keyboard.dismiss}
+                onPress={(data, details = null) => {
+                  console.log("endereco done", data?.description);
+                  setAddress(data?.description);
+                }}
+                query={{
+                  key: "AIzaSyDn1X_BlFj-57ydasP6uZK_X_WTERNJb78",
+                  language: "en",
+
+                  types: ["(cities)"],
+                }}
+                styles={{
+                  container: {
+                    flex: 1,
+                  },
+                  textInput: {
+                    borderColor: colors.medium,
+                      backgroundColor: colors.light,
+                      borderWidth: 1,
+                      paddingHorizontal: 20,
+                      paddingVertical: 15,
+                      borderRadius: 10,
+                      marginTop: 15,
+                  },
+                  listView: {
+                    backgroundColor: "#fff",
+                    borderWidth: 1,
+                    borderColor: "#ccc",
+                    borderTopWidth: 0,
+                    marginTop: -1,
+                    marginLeft: 10,
+                    marginRight: 10,
+                    elevation: 1,
+                  },
+                }}
               />
+
+              
             </View>
 
             <TouchableOpacity

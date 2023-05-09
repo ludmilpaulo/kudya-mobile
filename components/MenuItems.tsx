@@ -49,21 +49,14 @@ const MenuItems = ({ resId, food, resName, resImage, foods }: Meals) => {
   const cartItems = useSelector(selectCartItems);
   const dispatch = useDispatch();
 
-
-
   function quantityUp() {
-   
     setQty(qty + 1);
-    
   }
 
   function quantityDown() {
     if (qty != 0) {
-     
       setQty(qty - 1);
-  
     }
-   
   }
 
   const match = (id: any) => {
@@ -131,7 +124,6 @@ const MenuItems = ({ resId, food, resName, resImage, foods }: Meals) => {
           style={tailwind`mb-3 flex-row justify-between items-center pb-3 border-b border-gray-100`}
         >
           <View style={tailwind`flex-1 pr-3 flex-row items-center`}>
-           
             <View style={tailwind`flex-1 pl-2`}>
               <Text
                 style={[
@@ -148,8 +140,6 @@ const MenuItems = ({ resId, food, resName, resImage, foods }: Meals) => {
                 {food.short_description}
               </Text>
             </View>
-
-            
 
             <View
               style={{
@@ -196,31 +186,29 @@ const MenuItems = ({ resId, food, resName, resImage, foods }: Meals) => {
           </View>
         </View>
 
-        {qty >0 && (
-              <>
-                {match(food.id) ? (
-                  <TouchableOpacity
-                    onPress={() => handleAddRemove(food.id)}
-                    style={tailwind`bg-black absolute bottom-1 self-center py-1 px-12 rounded-full z-50`}
-                  >
-                    <Text style={tailwind`text-white text-sm`}>
-                      Remover da Bandeja
-                    </Text>
-                  </TouchableOpacity>
-                ) : (
-                  <TouchableOpacity
-                    onPress={() => handleAddRemove(food.id)}
-                    style={tailwind`bg-black absolute bottom-1 self-center py-1 px-12 rounded-full z-50`}
-                  >
-                    <Text style={tailwind`text-white text-sm`}>
-                      Adicionar na Bandeja
-                    </Text>
-                  </TouchableOpacity>
-                )}
-              </>
+        {qty > 0 && (
+          <>
+            {match(food.id) ? (
+              <TouchableOpacity
+                onPress={() => handleAddRemove(food.id)}
+                style={tailwind`bg-black absolute bottom-1 self-center py-1 px-12 rounded-full z-50`}
+              >
+                <Text style={tailwind`text-white text-sm`}>
+                  Remover da Bandeja
+                </Text>
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity
+                onPress={() => handleAddRemove(food.id)}
+                style={tailwind`bg-black absolute bottom-1 self-center py-1 px-12 rounded-full z-50`}
+              >
+                <Text style={tailwind`text-white text-sm`}>
+                  Adicionar na Bandeja
+                </Text>
+              </TouchableOpacity>
             )}
-
-
+          </>
+        )}
       </View>
     </>
   );

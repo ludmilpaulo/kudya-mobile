@@ -6,7 +6,6 @@ import {
   TouchableOpacity,
   Text,
   Platform,
-
 } from "react-native";
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import tailwind from "tailwind-react-native-classnames";
@@ -16,15 +15,12 @@ import * as Location from "expo-location";
 import { useDispatch, useSelector } from "react-redux";
 import { selectCartItems, updateBusket } from "../redux/slices/basketSlice";
 
-
-
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
-
 
 import Screen from "../components/Screen";
 import { selectUser } from "../redux/slices/authSlice";
 
-const CheckoutScreen = ({ navigation } : { navigation:any}) => {
+const CheckoutScreen = ({ navigation }: { navigation: any }) => {
   const [location, setLocation] = useState({});
   const [errorMsg, setErrorMsg] = useState(null);
   const [userAddress, setUserAddress] = useState("");
@@ -38,8 +34,6 @@ const CheckoutScreen = ({ navigation } : { navigation:any}) => {
 
   const [loading, setLoading] = useState(true);
   const [loadingOrder, setLoadingOrder] = useState(false);
-
-
 
   const allCartItems = useSelector(selectCartItems);
 
@@ -55,10 +49,10 @@ const CheckoutScreen = ({ navigation } : { navigation:any}) => {
     longitude: longitude,
   };
 
-  console.log('endereco++>', userAddress)
+  console.log("endereco++>", userAddress);
   const userLocation = async () => {
     if (Platform.OS === "android" && !Device.isDevice) {
-        alert(
+      alert(
         "Oops, this will not work on Snack in an Android Emulator. Try it on your device!"
       );
       return;
@@ -88,7 +82,7 @@ const CheckoutScreen = ({ navigation } : { navigation:any}) => {
     return { meal_id: id, quantity };
   });
 
-  let resId = allCartItems.map(({ resId } : { resId : any }) => {
+  let resId = allCartItems.map(({ resId }: { resId: any }) => {
     return `${resId}`.toString();
   });
   let restaurantId = resId.toString();
@@ -103,12 +97,9 @@ const CheckoutScreen = ({ navigation } : { navigation:any}) => {
   };
 
   const completeOrder = async () => {
-    
     let tokenvalue = user?.token;
 
-  
-
-  if (!userAddress) {
+    if (!userAddress) {
       alert("Por favor Preencha o Endereço de Entrega");
     } else {
       let response = await fetch(
@@ -153,7 +144,7 @@ const CheckoutScreen = ({ navigation } : { navigation:any}) => {
     <>
       <View style={[tailwind`bg-blue-300 relative `, { height: 250 }]}>
         <MapView
-         ///  mapType="satellite"
+          ///  mapType="satellite"
           provider={PROVIDER_GOOGLE}
           region={initialRegion}
           // ref={mapRef}
@@ -174,65 +165,62 @@ const CheckoutScreen = ({ navigation } : { navigation:any}) => {
       </View>
 
       <Screen style={tailwind`flex-1`}>
+        <GooglePlacesAutocomplete
+          placeholder="Enter location"
+          onPress={(data, details = null) => {
+            console.log("endereco done", data?.description);
+            setUserAddress(data?.description);
+          }}
+          query={{
+            key: "AIzaSyDn1X_BlFj-57ydasP6uZK_X_WTERNJb78",
+            language: "en",
 
-<GooglePlacesAutocomplete
- placeholder="Enter location"
- 
- onPress={(data, details = null) => {
-   console.log("endereco done",data?.description);
-   setUserAddress(data?.description)
- }}
- query={{
-   key: 'AIzaSyDn1X_BlFj-57ydasP6uZK_X_WTERNJb78',
-   language: 'en',
+            types: ["(cities)"],
+          }}
+          styles={{
+            container: {
+              flex: 1,
+            },
+            textInput: {
+              height: 40,
+              borderWidth: 1,
+              borderColor: "#ccc",
+              borderRadius: 5,
+              paddingLeft: 10,
+              marginTop: 10,
+              marginLeft: 10,
+              marginRight: 10,
+            },
+            listView: {
+              backgroundColor: "#fff",
+              borderWidth: 1,
+              borderColor: "#ccc",
+              borderTopWidth: 0,
+              marginTop: -1,
+              marginLeft: 10,
+              marginRight: 10,
+              elevation: 1,
+            },
+          }}
+        />
 
-   types: ['(cities)'],
- }}
- styles={{
-   container: {
-     flex: 1,
-   },
-   textInput: {
-     height: 40,
-     borderWidth: 1,
-     borderColor: '#ccc',
-     borderRadius: 5,
-     paddingLeft: 10,
-     marginTop: 10,
-     marginLeft: 10,
-     marginRight: 10,
-   },
-   listView: {
-     backgroundColor: '#fff',
-     borderWidth: 1,
-     borderColor: '#ccc',
-     borderTopWidth: 0,
-     marginTop: -1,
-     marginLeft: 10,
-     marginRight: 10,
-     elevation: 1,
-   },
- }}
-/>
-      
-      <TextInput
-          style={tailwind`h-10 w-full bg-white rounded-full items-center justify-center border border-blue-500 `} 
-            placeholder="Adicione seu endereço" 
-            value={userAddress}
-            onChangeText={(text) => setUserAddress(text)}
-            autoCapitalize={'none'}
-          />
+        <TextInput
+          style={tailwind`h-10 w-full bg-white rounded-full items-center justify-center border border-blue-500 `}
+          placeholder="Adicione seu endereço"
+          value={userAddress}
+          onChangeText={(text) => setUserAddress(text)}
+          autoCapitalize={"none"}
+        />
 
-
-        <TouchableOpacity 
-         style={tailwind`h-10 w-full bg-white rounded-full items-center justify-center border border-blue-500 `} 
-          onPress={completeOrder}>
+        <TouchableOpacity
+          style={tailwind`h-10 w-full bg-white rounded-full items-center justify-center border border-blue-500 `}
+          onPress={completeOrder}
+        >
           <Text>FAÇA SEU PEDIDO </Text>
         </TouchableOpacity>
       </Screen>
     </>
   );
 };
-
 
 export default CheckoutScreen;

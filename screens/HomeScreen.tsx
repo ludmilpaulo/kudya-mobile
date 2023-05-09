@@ -20,11 +20,11 @@ import Screen from "../components/Screen";
 import colors from "../configs/colors";
 import { useDispatch, useSelector } from "react-redux";
 import { selectUser } from "../redux/slices/authSlice";
-import Geocoder from 'react-native-geocoding';
+import Geocoder from "react-native-geocoding";
 import * as Device from "expo-device";
 import * as Location from "expo-location";
 
-
+import AccountScreen from "./AccountScreen";
 
 interface Restaurant {
   id: number;
@@ -34,7 +34,7 @@ interface Restaurant {
   logo: string;
 }
 
-Geocoder.init('AIzaSyDn1X_BlFj-57ydasP6uZK_X_WTERNJb78');
+Geocoder.init("AIzaSyDn1X_BlFj-57ydasP6uZK_X_WTERNJb78");
 
 const HomeScreen = () => {
   const user = useSelector(selectUser);
@@ -42,13 +42,17 @@ const HomeScreen = () => {
   const dispatch = useDispatch();
 
   const url = "https://www.sunshinedeliver.com";
- // const [restaurantData, setRestaurantData] = useState<Restaurant[]>([]);
+  // const [restaurantData, setRestaurantData] = useState<Restaurant[]>([]);
   const [search, setSearch] = useState("");
-  const [address, setAddress] = useState('');
+  const [address, setAddress] = useState("");
 
   const [userPhoto, setUserPhoto] = useState("");
+  const [userPhone, setUserPhone] = useState("");
+
   const [userId, setUserId] = useState<any>();
-  const [filteredDataSource, setFilteredDataSource] = useState<Restaurant[]>([]);
+  const [filteredDataSource, setFilteredDataSource] = useState<Restaurant[]>(
+    []
+  );
   const [masterDataSource, setMasterDataSource] = useState<Restaurant[]>([]);
   const [loading, setLoading] = React.useState(false);
 
@@ -57,57 +61,75 @@ const HomeScreen = () => {
 
   const [currentLocation, setCurrentLocation] = useState<any>();
 
-  useEffect(()=>{
+  const pickUser = async () => {
+    let response = await fetch(
+      "https://www.sunshinedeliver.com/api/customer/profile/",
+      {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          user_id: user?.user_id,
+        }),
+      }
+    )
+      .then((response) => response.json())
+      .then((responseJson) => {
+        setUserPhoto(responseJson.customer_detais.avatar);
+      })
+      .catch((error) => {
+        // console.error(error);
+      });
+  };
+
+  useEffect(() => {
+    console.log("user photo", customer_image);
+
+    pickUser();
     const timer = setInterval(() => userLocation(), 2000);
-    return () => clearInterval(timer);   
-  }, [])
+    return () => clearInterval(timer);
+  }, []);
 
-      const userLocation = async () => {
-        if (Platform.OS === "android" && !Device.isDevice) {
-            alert(
-            "Oops, this will not work on Snack in an Android Emulator. Try it on your device!"
-          );
-          return;
-        }
-        let { status } = await Location.requestForegroundPermissionsAsync();
-        if (status !== "granted") {
-          alert("Permission to access location was denied");
-          return;
-        }
+  const userLocation = async () => {
+    if (Platform.OS === "android" && !Device.isDevice) {
+      alert(
+        "Oops, this will not work on Snack in an Android Emulator. Try it on your device!"
+      );
+      return;
+    }
+    let { status } = await Location.requestForegroundPermissionsAsync();
+    if (status !== "granted") {
+      alert("Permission to access location was denied");
+      return;
+    }
 
-        let location = await Location.getCurrentPositionAsync({});
-       // dispatch(setLocation(location.coords))
-       // console.log(location.coords)
-        setCurrentLocation(location.coords);
+    let location = await Location.getCurrentPositionAsync({});
+    // dispatch(setLocation(location.coords))
+    // console.log(location.coords)
+    setCurrentLocation(location.coords);
 
-        Geocoder.from(location?.coords)
-      .then(response => {
+    Geocoder.from(location?.coords)
+      .then((response) => {
         const formattedAddress = response.results[0].formatted_address;
         setAddress(formattedAddress);
       })
-      .catch(error => {
+      .catch((error) => {
         console.log(error);
       });
-      };
+  };
 
-
-  
-
- 
   useEffect(() => {
-
     getRestaurant();
-
-  
   }, []);
-
 
   const getRestaurant = async () => {
     try {
       fetch("https://www.sunshinedeliver.com/api/customer/restaurants/")
         .then((response) => response.json())
         .then((responseJson) => {
-        //  setRestaurantData(responseJson?.restaurants);
+          //  setRestaurantData(responseJson?.restaurants);
           setFilteredDataSource(responseJson?.restaurants);
           setMasterDataSource(responseJson?.restaurants);
         })
@@ -145,11 +167,6 @@ const HomeScreen = () => {
       setSearch(text);
     }
   };
-  
-
-  
-  
-
 
   return (
     <Screen style={tailwind`pt-5`}>
@@ -165,21 +182,16 @@ const HomeScreen = () => {
             <Text style={tailwind`font-bold text-gray-400 text-xs`}>
               Entregue agora!
             </Text>
-            <Text style={tailwind`font-bold text-xl`}>
-             {address}
-             
-            </Text>
+            <Text style={tailwind`font-bold text-xl`}>{address}</Text>
           </View>
-
-          
         </View>
         {/**Search */}
         <View style={tailwind`flex-row items-center pb-2 mx-4 px-4`}>
           <View style={tailwind`rounded-full flex-row flex-1 bg-gray-100 p-3`}>
             <MagnifyingGlassIcon color="#004AAD" size={20} />
             <TextInput
-            onChangeText={(text) => searchFilterFunction(text)}
-            value={search}
+              onChangeText={(text) => searchFilterFunction(text)}
+              value={search}
               placeholder="Restaurantes e cozinhas"
               keyboardType="default"
             />

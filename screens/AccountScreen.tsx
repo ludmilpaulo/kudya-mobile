@@ -30,8 +30,6 @@ const AccountScreen = () => {
   const customer_avatar = `${userPhoto}`;
   const customer_image = `${url}${customer_avatar}`;
 
-  console.log("resposan", userId);
-
   const pickUser = async () => {
     let response = await fetch(
       "https://www.sunshinedeliver.com/api/customer/profile/",
@@ -82,8 +80,6 @@ const AccountScreen = () => {
   const onLogout = async () => {
     try {
       dispatch(logoutUser());
-      // await AsyncStorage.removeItem("authUser");
-      // Updates.reloadAsync();
     } catch (e) {
       console.log(e);
     }

@@ -13,11 +13,8 @@ import { selectUser } from "../redux/slices/authSlice";
 const Stack = createStackNavigator();
 
 export default function HomeNavigator() {
-
   const user = useSelector(selectUser);
   const dispatch = useDispatch();
-  
-
 
   return (
     <Stack.Navigator
