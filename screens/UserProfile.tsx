@@ -18,6 +18,7 @@ import { AntDesign } from "@expo/vector-icons";
 import { Ionicons } from "@expo/vector-icons";
 
 import colors from "../configs/colors";
+import { googleAPi } from "../configs/variable";
 
 import * as ImagePicker from "expo-image-picker";
 import * as Permissions from "expo-permissions";
@@ -34,12 +35,20 @@ import { logoutUser, selectUser } from "../redux/slices/authSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 
+import Geocoder from "react-native-geocoding";
+import * as Device from "expo-device";
+import * as Location from "expo-location";
+import { Camera } from 'expo-camera';
+
+
 type ImageInfo = {
   uri: string;
   width: number;
   height: number;
   type: string;
 };
+
+Geocoder.init(googleAPi);
 
 const UserProfile = () => {
   const user = useSelector(selectUser);
@@ -53,13 +62,47 @@ const UserProfile = () => {
   const [first_name, setFirst_name] = useState("");
   const [last_name, setLast_name] = useState("");
 
+  const [location, setLocation] = useState('');
+
+
   const [Type, setType] = useState("");
 
   const navigation = useNavigation<any>();
 
   const [keyboardStatus, setKeyboardStatus] = useState(undefined);
 
+  const userLocation = async () => {
+    if (Platform.OS === "android" && !Device.isDevice) {
+      alert(
+        "Oops, this will not work on Snack in an Android Emulator. Try it on your device!"
+      );
+      return;
+    }
+    let { status } = await Location.requestForegroundPermissionsAsync();
+    if (status !== "granted") {
+      alert("Permission to access location was denied");
+      return;
+    }
+
+    let location = await Location.getCurrentPositionAsync({});
+    // dispatch(setLocation(location.coords))
+     console.log(location.coords)
+
+    Geocoder.from(location?.coords)
+      .then((response) => {
+        const formattedAddress = response.results[0].formatted_address;
+        setAddress(formattedAddress);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+
   useEffect(() => {
+
+    userLocation();
+   
     const showSubscription = Keyboard.addListener("keyboardDidShow", () => {
       setKeyboardStatus("Keyboard Shown");
     });
@@ -77,6 +120,7 @@ const UserProfile = () => {
 
   const handleTakePhoto = async () => {
     const { status } = await Permissions.askAsync(Permissions.CAMERA);
+   //let { status } = await Camera.requestPermissionsAsync();
     if (status !== "granted") {
       alert("Permission to access camera denied");
       return;
@@ -111,7 +155,7 @@ const UserProfile = () => {
   const userUpdate = async () => {
     // const value = await AsyncStorage.getItem("authUser");
     // const tokenData = JSON.parse(value || {});
-    let tokenvalue = user?.token;
+  
 
     // ImagePicker saves the taken photo to disk and returns a local URI to it
     if (!imageInfo) {
@@ -124,7 +168,7 @@ const UserProfile = () => {
     let formData = new FormData();
     // Assume "photo" is the name of the form field the server expects
     formData.append("avatar", { uri, type, name: "image.jpg" });
-    formData.append("access_token", tokenvalue);
+    formData.append("access_token", user?.token);
     formData.append("address", address);
     formData.append("first_name", first_name);
     formData.append("last_name", last_name);
@@ -186,8 +230,12 @@ const UserProfile = () => {
             </TouchableOpacity>
           </View>
 
-          <View style={styles.form}>
-            <View style={styles.containertest}>
+          <View style={tailwind`grid grid-cols-1 gap-1`}>
+
+         
+
+            <View style={tailwind`grid grid-flow-col auto-cols-max md:auto-cols-min`}>
+
               <TextInput
                 style={styles.input}
                 placeholder="Primeiro Nome"
@@ -204,44 +252,8 @@ const UserProfile = () => {
                 autoCapitalize={"none"}
                 onSubmitEditing={Keyboard.dismiss}
               />
-
-              <GooglePlacesAutocomplete
-                placeholder="Seu Endereço"
-                onPress={(data, details = null) => {
-                  console.log("endereco done", data?.description);
-                  setAddress(data?.description);
-                }}
-                query={{
-                  key: "AIzaSyDn1X_BlFj-57ydasP6uZK_X_WTERNJb78",
-                  language: "en",
-
-                  types: ["(cities)"],
-                }}
-                styles={{
-                  container: {
-                    flex: 1,
-                  },
-                  textInput: {
-                    borderColor: colors.medium,
-                    backgroundColor: colors.light,
-                    borderWidth: 1,
-                    paddingHorizontal: 20,
-                    paddingVertical: 15,
-                    borderRadius: 10,
-                    marginTop: 15,
-                  },
-                  listView: {
-                    backgroundColor: "#fff",
-                    borderWidth: 1,
-                    borderColor: "#ccc",
-                    borderTopWidth: 0,
-                    marginTop: -1,
-                    marginLeft: 10,
-                    marginRight: 10,
-                    elevation: 1,
-                  },
-                }}
-              />
+             
+            
 
               <TextInput
                 style={styles.input}
@@ -261,6 +273,7 @@ const UserProfile = () => {
               <Text style={styles.vamosJuntos}>Atualize seu Perfil</Text>
             </TouchableOpacity>
           </View>
+          
         </View>
       </Screen>
     </>
@@ -355,7 +368,7 @@ const styles = StyleSheet.create({
   },
   containertext: {
     width: 159,
-    height: 32,
+   // height: 42,
   },
   vamosJuntos: {
     color: colors.white,
@@ -363,6 +376,7 @@ const styles = StyleSheet.create({
     // textTransform: 'uppercase',
     fontWeight: "700",
   },
+ 
 });
 
 export default UserProfile;

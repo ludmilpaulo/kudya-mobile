@@ -22,6 +22,7 @@ import MapView, {
   Region,
 } from "react-native-maps";
 import { DirectionsService } from "react-native-maps";
+import { googleAPi } from "../configs/variable";
 
 import { selectUser } from "../redux/slices/authSlice";
 
@@ -68,7 +69,7 @@ const Delivery = () => {
 
   const destination = { latitude: userlatitude, longitude: userlongitude }; // San Francisco
 
-  const GOOGLE_MAPS_APIKEY = "AIzaSyDn1X_BlFj-57ydasP6uZK_X_WTERNJb78";
+  const GOOGLE_MAPS_APIKEY = googleAPi;
 
 
   const getDriverLocation = async () => {
@@ -90,8 +91,7 @@ const Delivery = () => {
     const locationData = await response.json();
     setDriverLocation(locationData?.location);
 
-    console.log("driver location",driverData);
-
+   
  
   };
 
@@ -131,9 +131,12 @@ const Delivery = () => {
   const [travelTime, setTravelTime] = useState<number | null>(null);
 
   useEffect(() => {
-    const timer = setInterval(() => getDriverLocation(), 2000);
+    const timer = setInterval(() => getDriverLocation(),
+     2000);
     return () => clearInterval(timer);
   },[getDriverLocation]);
+
+  
 
   useEffect(() => {
     pickOrder();
@@ -182,11 +185,6 @@ const Delivery = () => {
       ref.current?.animateCamera({ center: driver, zoom: 18 });
     }
 
-    
-
-    console.log('center', driverData)
-
-
   }, [driver]);
 
 
@@ -223,6 +221,37 @@ const Delivery = () => {
           console.error(error);
         });
 }
+
+
+const calculateTravelTime = async () => {
+  const apiUrl = `https://maps.googleapis.com/maps/api/distancematrix/json?origins=${driverLatitude},${driverLongitude}&destinations=${userlatitude},${userlongitude}&mode=driving&key=${googleAPi}`;
+
+  try {
+    const response = await fetch(apiUrl);
+    const responseJson = await response.json();
+
+    console.log(" duration", responseJson)
+
+    if (responseJson.status === 'OK') {
+      const { duration } = responseJson.rows[0].elements[0];
+
+    
+      return duration.text;
+    } else {
+      console.log('Error fetching travel time: ', responseJson.status);
+    }
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+useEffect(() => {
+  const timer = setInterval(() => 
+  calculateTravelTime(),
+   2000);
+  return () => clearInterval(timer);
+},[calculateTravelTime]);
+
 
 
   return (
