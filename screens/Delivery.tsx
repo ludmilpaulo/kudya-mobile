@@ -31,14 +31,15 @@ import * as Device from "expo-device";
 import axios from "axios";
 
 interface LatLng {
-  latitude: number;
-  longitude: number;
+  latitude: any;
+  longitude: any;
 }
 
 const Delivery = () => {
   const navigation = useNavigation();
 
-  const mapRef = useRef(null);
+  const ref = useRef<MapView | null>(null);
+
 
   const [deliveryDuration, setDeliveryDuration] = useState();
   const [deliveryPoints, setDeliveryPoints] = useState();
@@ -50,38 +51,29 @@ const Delivery = () => {
   const [userlongitude, setUserLongitude] = useState(0);
   const [userlatitude, setUserLatitude] = useState(0);
 
-  const [destination, setDestination] = useState();
+
 
   const [driverLongitude, setDriverLong] = useState(0);
   const [driverLatitude, setDriverLat] = useState(0);
+  const [ driver, setDriver ] = useState<{longitude: number, latitude: number} | undefined>(undefined);
+
+  const [data, setData ]= useState([{}]);
+  const [driverData, setDriverData] = useState({});
+  const [restaurantData, setRestaurantData] = useState([]);
+  const [orderData, setOrderData] = useState([]);
 
   const user = useSelector(selectUser);
 
+  const origin = { latitude: driverLatitude, longitude: driverLongitude }; // New York City
+
+  const destination = { latitude: userlatitude, longitude: userlongitude }; // San Francisco
+
   const GOOGLE_MAPS_APIKEY = "AIzaSyDn1X_BlFj-57ydasP6uZK_X_WTERNJb78";
 
-  const getTravelTime = async (
-    origin: LatLng,
-    destination: LatLng
-  ): Promise<number | null> => {
-    const apiKey = "AIzaSyDn1X_BlFj-57ydasP6uZK_X_WTERNJb78";
-    const url = `https://maps.googleapis.com/maps/api/directions/json?origin=${origin.latitude},${origin.longitude}&destination=${destination.latitude},${destination.longitude}&key=${apiKey}`;
-    try {
-      const response = await axios.get(url);
-      const duration = response.data.routes[0]?.legs[0].duration.value;
-      const points = response.data.routes[0].overview_polyline.points;
-      setDeliveryDuration(duration);
-      setDeliveryPoints(points);
-      return duration;
-    } catch (error) {
-      console.log(error);
-      return null;
-    }
-  };
 
   const getDriverLocation = async () => {
     let userName = user.username;
-    setDestination(userName);
-
+   
     let response = await fetch(
       "https://www.sunshinedeliver.com/api/customer/driver/location/",
       {
@@ -98,9 +90,9 @@ const Delivery = () => {
     const locationData = await response.json();
     setDriverLocation(locationData?.location);
 
-    console.log("driver location");
+    console.log("driver location",driverData);
 
-    console.log("API call", response);
+ 
   };
 
   const initialRegion = {
@@ -139,20 +131,21 @@ const Delivery = () => {
   const [travelTime, setTravelTime] = useState<number | null>(null);
 
   useEffect(() => {
-    userLocation();
-    getDriverLocation();
+    const timer = setInterval(() => getDriverLocation(), 2000);
+    return () => clearInterval(timer);
+  },[getDriverLocation]);
 
-    covertDriverLocation();
+  useEffect(() => {
+    pickOrder();
+    const timer = setInterval(() => covertDriverLocation()
+  
+      , 2000);
+    return () => clearInterval(timer);
+  },[]);
 
-    const origin = { latitude: driverLatitude, longitude: driverLongitude }; // New York City
-
-    const destination = { latitude: userlatitude, longitude: userlongitude }; // San Francisco
-    getTravelTime(origin, destination).then((time) => setTravelTime(time));
-
-    console.log("initial o", origin);
-  }, []);
 
   const covertDriverLocation = async () => {
+    if (driverLocation !== undefined) {
     const final = driverLocation
       .replace(/{|},|}/g, "\n")
       .replace(/\[|\]|"/g, "")
@@ -168,28 +161,69 @@ const Delivery = () => {
     let value = JSON.parse(blah2);
     setDriverLong(value.longitude); //it prints here
     setDriverLat(value.latitude); //it prints here
+    setDriver({
+      longitude: parseFloat(value.longitude),
+      latitude: parseFloat(value.latitude),
+    })
+
+    }
   };
 
-  const [directionCoords, setDirectionCoords] = useState([]);
-
-  const handleGetDirections = () => {
-    const origin = { latitude: 37.78825, longitude: -122.4324 };
-    const destination = { latitude: 37.7749, longitude: -122.4194 };
-    DirectionsService.route(
-      {
-        origin,
-        destination,
-        travelMode: "DRIVING",
-      },
-      (result, status) => {
-        if (status === "OK") {
-          setDirectionCoords(result.routes[0].overview_path);
-        } else {
-          console.error(result);
-        }
-      }
-    );
+  let center = {
+    latitude: driver ? driver?.latitude : 0,
+    longitude: driver ? driver?.longitude : 0,
+    latitudeDelta: 0.005,
+    longitudeDelta: 0.005,
   };
+
+  useEffect(() => {
+    if (driver) {
+      console.debug(driver);
+      ref.current?.animateCamera({ center: driver, zoom: 18 });
+    }
+
+    
+
+    console.log('center', driverData)
+
+
+  }, [driver]);
+
+
+
+
+  const pickOrder = async() => {
+   
+    let response = await fetch('https://www.sunshinedeliver.com/api/customer/order/latest/', {
+          method: 'POST',
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            access_token: user?.token,
+          
+          })
+      })
+       .then((response) => response.json())
+       .then((responseJson) => {
+         if(responseJson.order.total==null){     
+         alert(" Voce Nao tem nenhum Pedido a Caminho")
+           navigation.goBack()
+           
+            }
+            else{
+        setData(responseJson.order);
+        setDriverData(responseJson.order.driver);
+        setRestaurantData(responseJson.order.restaurant);
+        setOrderData(responseJson.order.order_details);
+    }
+        })  
+        .catch((error) => {
+          console.error(error);
+        });
+}
+
 
   return (
     <Screen style={tailwind`flex-1`}>
@@ -204,14 +238,14 @@ const Delivery = () => {
         <View style={tailwind`flex-row justify-between`}>
           <View>
             <Text style={tailwind`text-lg text-gray-400`}>
-              Estimated Arrival
+              Estimated Arrival 
             </Text>
             <Text></Text>
-            {travelTime && (
+        
               <Text style={tailwind`text-4xl font-bold`}>
-                Travel time: {Math.round(travelTime / 60)} minutes
+                Travel time: 59 minutes
               </Text>
-            )}
+         
           </View>
           <Image
             source={{
@@ -223,15 +257,16 @@ const Delivery = () => {
         <Progress.Bar size={30} color="#004AAD" indeterminate={true} />
       </View>
       <View style={[tailwind`bg-blue-300 relative `, { height: 500 }]}>
-        <Button title="Get Directions" onPress={getTravelTime} />
-        <MapView region={initialCoordinate} style={tailwind`h-full z-10`}>
-          {directionCoords.length > 0 && (
-            <Polyline
-              coordinates={directionCoords}
-              strokeColor="#F00"
-              strokeWidth={3}
-            />
-          )}
+      {center && (
+          <>
+        <MapView 
+        ref={ref}
+        region={{
+          ...center
+        }}
+        
+        style={tailwind`h-full z-10`}>
+      
           <Marker coordinate={initialCoordinate}>
             <Image
               source={{
@@ -240,9 +275,11 @@ const Delivery = () => {
               style={tailwind`h-20 w-20`}
             />
           </Marker>
-          <Marker coordinate={{ latitude: 37.7749, longitude: -122.4194 }} />
+        
         </MapView>
-        <Button title="Get Directions" onPress={handleGetDirections} />
+        </>
+        )}
+       
       </View>
     </Screen>
   );

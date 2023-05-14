@@ -24,6 +24,14 @@
         "backgroundColor": "#FFFFFF"
       }
     },
+    "blockedPermissions": [
+      "android.permission.RECORD_AUDIO"
+    ],
+    "config": {
+      "googleMaps": {
+        "apiKey": "AIzaSyDn1X_BlFj-57ydasP6uZK_X_WTERNJb78"
+      }
+    },
     "web": {
       "favicon": "./assets/favicon.png"
     }

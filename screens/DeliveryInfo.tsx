@@ -9,17 +9,17 @@ import { useNavigation } from "@react-navigation/native";
 import colors from "../configs/colors";
 
 const DeliveryInfo = () => {
-  const [data, setData] = useState([{}]);
-  const [driverData, setdriverData] = useState({});
-  const [restaurantData, setRestaurantData] = useState([]);
-  const [orderData, setOrderData] = useState([]);
+  const [data, setData ]= useState([{}]);
+      const [driverData, setdriverData] = useState({});
+      const [restaurantData, setRestaurantData] = useState([]);
+      const [orderData, setOrderData] = useState([]);
 
-  const [loadingOrder, setLoadingOrder] = useState();
+      const [loadingOrder, setLoadingOrder] = useState();
 
-  const navigation = useNavigation();
+      const navigation = useNavigation();
 
-  console.log("order==>", driverData);
-  /*
+      console.log("order==>", driverData)
+
       
 const pickOrder = async() => {
     const value = await AsyncStorage.getItem('authUser');
@@ -56,11 +56,13 @@ const pickOrder = async() => {
         });
 }
 
-*/
+useEffect(() =>{
 
-  useEffect(() => {
-    // pickOrder();
-  }, []);
+  pickOrder();
+
+}, []);
+
+  
   return (
     <View>
       <Text>DeliveryInfo</Text>

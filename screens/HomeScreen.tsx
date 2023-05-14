@@ -24,6 +24,8 @@ import Geocoder from "react-native-geocoding";
 import * as Device from "expo-device";
 import * as Location from "expo-location";
 
+import { googleAPi } from "../configs/variable";
+
 import AccountScreen from "./AccountScreen";
 
 interface Restaurant {
@@ -34,7 +36,7 @@ interface Restaurant {
   logo: string;
 }
 
-Geocoder.init("AIzaSyDn1X_BlFj-57ydasP6uZK_X_WTERNJb78");
+Geocoder.init(googleAPi);
 
 const HomeScreen = () => {
   const user = useSelector(selectUser);

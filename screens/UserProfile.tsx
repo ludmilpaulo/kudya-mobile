@@ -204,15 +204,6 @@ const UserProfile = () => {
                 autoCapitalize={"none"}
                 onSubmitEditing={Keyboard.dismiss}
               />
-              <TextInput
-                style={styles.input}
-                placeholder="Número de Telefone"
-                autoCompleteType="off"
-                value={phone}
-                onChangeText={(text) => setPhone(text)}
-                autoCapitalize={"none"}
-                onSubmitEditing={Keyboard.dismiss}
-              />
 
               <GooglePlacesAutocomplete
                 placeholder="Seu Endereço"
@@ -232,12 +223,12 @@ const UserProfile = () => {
                   },
                   textInput: {
                     borderColor: colors.medium,
-                      backgroundColor: colors.light,
-                      borderWidth: 1,
-                      paddingHorizontal: 20,
-                      paddingVertical: 15,
-                      borderRadius: 10,
-                      marginTop: 15,
+                    backgroundColor: colors.light,
+                    borderWidth: 1,
+                    paddingHorizontal: 20,
+                    paddingVertical: 15,
+                    borderRadius: 10,
+                    marginTop: 15,
                   },
                   listView: {
                     backgroundColor: "#fff",
@@ -252,7 +243,15 @@ const UserProfile = () => {
                 }}
               />
 
-              
+              <TextInput
+                style={styles.input}
+                placeholder="Número de Telefone"
+                autoCompleteType="off"
+                value={phone}
+                onChangeText={(text) => setPhone(text)}
+                autoCapitalize={"none"}
+                onSubmitEditing={Keyboard.dismiss}
+              />
             </View>
 
             <TouchableOpacity
