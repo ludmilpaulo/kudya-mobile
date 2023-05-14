@@ -41,6 +41,8 @@ const Delivery = () => {
 
   const ref = useRef<MapView | null>(null);
 
+  const [time, setTime] = React.useState('');
+
 
   const [deliveryDuration, setDeliveryDuration] = useState();
   const [deliveryPoints, setDeliveryPoints] = useState();
@@ -65,9 +67,6 @@ const Delivery = () => {
 
   const user = useSelector(selectUser);
 
-  const origin = { latitude: driverLatitude, longitude: driverLongitude }; // New York City
-
-  const destination = { latitude: userlatitude, longitude: userlongitude }; // San Francisco
 
   const GOOGLE_MAPS_APIKEY = googleAPi;
 
@@ -90,6 +89,7 @@ const Delivery = () => {
     );
     const locationData = await response.json();
     setDriverLocation(locationData?.location);
+    
 
    
  
@@ -138,13 +138,7 @@ const Delivery = () => {
 
   
 
-  useEffect(() => {
-    pickOrder();
-    const timer = setInterval(() => covertDriverLocation()
-  
-      , 2000);
-    return () => clearInterval(timer);
-  },[]);
+ 
 
 
   const covertDriverLocation = async () => {
@@ -171,6 +165,12 @@ const Delivery = () => {
 
     }
   };
+
+  useEffect(() => {
+    pickOrder();
+    const timer = setInterval(() => covertDriverLocation(), 2000);
+    return () => clearInterval(timer);
+  },[covertDriverLocation]);
 
   let center = {
     latitude: driver ? driver?.latitude : 0,
@@ -224,25 +224,27 @@ const Delivery = () => {
 
 
 const calculateTravelTime = async () => {
-  const apiUrl = `https://maps.googleapis.com/maps/api/distancematrix/json?origins=${driverLatitude},${driverLongitude}&destinations=${userlatitude},${userlongitude}&mode=driving&key=${googleAPi}`;
 
-  try {
-    const response = await fetch(apiUrl);
-    const responseJson = await response.json();
+  const apiKey = googleAPi;
+  const originLat = driver ? driver?.latitude : 0;
+  const originLng = driver ? driver?.longitude : 0;
+  console.log("driver location",driverLatitude)
+  const destinationLat = userlatitude;
+  const destinationLng = userlongitude;
+  const mode = 'driving';
+  const url = `https://maps.googleapis.com/maps/api/directions/json?origin=${originLat},${originLng}&destination=${destinationLat},${destinationLng}&mode=${mode}&key=${apiKey}`;
+  
+  fetch(url)
+    .then(response => response.json())
+    .then(data => {
+      const travelTimeInSeconds = data.routes[0].legs[0].duration.value;
+      const travelTimeInMinutes = Math.ceil(travelTimeInSeconds / 60);
+      setTime(travelTimeInSeconds.toFixed(2));
+      console.log(`Travel time: ${travelTimeInMinutes} minutes`);
+    })
+    .catch(error => console.error('No route information available.'));
 
-    console.log(" duration", responseJson)
-
-    if (responseJson.status === 'OK') {
-      const { duration } = responseJson.rows[0].elements[0];
-
-    
-      return duration.text;
-    } else {
-      console.log('Error fetching travel time: ', responseJson.status);
-    }
-  } catch (error) {
-    console.error(error);
-  }
+  
 };
 
 useEffect(() => {
@@ -272,7 +274,7 @@ useEffect(() => {
             <Text></Text>
         
               <Text style={tailwind`text-4xl font-bold`}>
-                Travel time: 59 minutes
+                Travel time: {time}
               </Text>
          
           </View>
