@@ -153,8 +153,7 @@ const UserProfile = () => {
   };
 
   const userUpdate = async () => {
-    // const value = await AsyncStorage.getItem("authUser");
-    // const tokenData = JSON.parse(value || {});
+    
   
 
     // ImagePicker saves the taken photo to disk and returns a local URI to it
@@ -176,7 +175,7 @@ const UserProfile = () => {
 
     console.log("shool ==>", formData);
 
-    try {
+   // try {
       let response = await fetch(
         "https://www.sunshinedeliver.com/api/customer/profile/update/",
         {
@@ -201,12 +200,12 @@ const UserProfile = () => {
         alert("" + resp.non_field_errors);
         console.log("err", resp);
       }
-    } catch (e) {
-      console.log("alila", e);
-      alert("O usuário não existe, inscreva-se ou tente fazer login novamente");
-      // await AsyncStorage.removeItem("authUser");
+  //  } catch (e) {
+    //  console.log("alila", e);
+     // alert("O usuário não existe, inscreva-se ou tente fazer login novamente");
+    
       Updates.reloadAsync();
-    }
+  //  }
   };
 
   return (
@@ -230,11 +229,11 @@ const UserProfile = () => {
             </TouchableOpacity>
           </View>
 
-          <View style={tailwind`grid grid-cols-1 gap-1`}>
+          <View>
 
          
 
-            <View style={tailwind`grid grid-flow-col auto-cols-max md:auto-cols-min`}>
+            <View>
 
               <TextInput
                 style={styles.input}

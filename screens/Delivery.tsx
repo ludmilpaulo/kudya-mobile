@@ -21,7 +21,7 @@ import MapView, {
   Polyline,
   Region,
 } from "react-native-maps";
-import { DirectionsService } from "react-native-maps";
+
 import { googleAPi } from "../configs/variable";
 
 import { selectUser } from "../redux/slices/authSlice";
@@ -41,8 +41,7 @@ const Delivery = () => {
 
   const ref = useRef<MapView | null>(null);
 
-  const [time, setTime] = React.useState('');
-
+  const [time, setTime] = React.useState("");
 
   const [deliveryDuration, setDeliveryDuration] = useState();
   const [deliveryPoints, setDeliveryPoints] = useState();
@@ -54,26 +53,24 @@ const Delivery = () => {
   const [userlongitude, setUserLongitude] = useState(0);
   const [userlatitude, setUserLatitude] = useState(0);
 
-
-
   const [driverLongitude, setDriverLong] = useState(0);
   const [driverLatitude, setDriverLat] = useState(0);
-  const [ driver, setDriver ] = useState<{longitude: number, latitude: number} | undefined>(undefined);
+  const [driver, setDriver] = useState<
+    { longitude: number; latitude: number } | undefined
+  >(undefined);
 
-  const [data, setData ]= useState([{}]);
+  const [data, setData] = useState([{}]);
   const [driverData, setDriverData] = useState({});
   const [restaurantData, setRestaurantData] = useState([]);
   const [orderData, setOrderData] = useState([]);
 
   const user = useSelector(selectUser);
 
-
   const GOOGLE_MAPS_APIKEY = googleAPi;
-
 
   const getDriverLocation = async () => {
     let userName = user.username;
-   
+
     let response = await fetch(
       "https://www.sunshinedeliver.com/api/customer/driver/location/",
       {
@@ -88,11 +85,11 @@ const Delivery = () => {
       }
     );
     const locationData = await response.json();
-    setDriverLocation(locationData?.location);
-    
+    console.log("location data", locationData);
 
-   
- 
+    setDriverLocation(locationData?.location);
+
+    userLocation();
   };
 
   const initialRegion = {
@@ -126,43 +123,44 @@ const Delivery = () => {
     setUserLongitude(location.coords.longitude);
     setUserLatitude(location.coords.latitude);
     setLocation(location);
+
+    userLocation();
   };
+
+  useEffect(() => {
+    const timer = setInterval(() => userLocation(), 2000);
+    return () => clearInterval(timer);
+  }, [userLocation]);
 
   const [travelTime, setTravelTime] = useState<number | null>(null);
 
   useEffect(() => {
-    const timer = setInterval(() => getDriverLocation(),
-     2000);
+    const timer = setInterval(() => getDriverLocation(), 2000);
     return () => clearInterval(timer);
-  },[getDriverLocation]);
-
+  }, [getDriverLocation]);
   
-
- 
-
 
   const covertDriverLocation = async () => {
     if (driverLocation !== undefined) {
-    const final = driverLocation
-      .replace(/{|},|}/g, "\n")
-      .replace(/\[|\]|"/g, "")
-      .replace(/,/g, ",\n");
+      const final = driverLocation
+        .replace(/{|},|}/g, "\n")
+        .replace(/\[|\]|"/g, "")
+        .replace(/,/g, ",\n");
 
-    //let blah2 = driverLocation.replace(/[{}]/g, '');
+      //let blah2 = driverLocation.replace(/[{}]/g, '');
 
-    let q = driverLocation.replace(/['"]+/g, "").replace(/[{}]/g, "");
+      let q = driverLocation.replace(/['"]+/g, "").replace(/[{}]/g, "");
 
-    let blah2 = driverLocation.replace(/['']/g, '"');
+      let blah2 = driverLocation.replace(/['']/g, '"');
 
-    //use the value variable to get the longitude and latitude values
-    let value = JSON.parse(blah2);
-    setDriverLong(value.longitude); //it prints here
-    setDriverLat(value.latitude); //it prints here
-    setDriver({
-      longitude: parseFloat(value.longitude),
-      latitude: parseFloat(value.latitude),
-    })
-
+      //use the value variable to get the longitude and latitude values
+      let value = JSON.parse(blah2);
+      setDriverLong(value.longitude); //it prints here
+      setDriverLat(value.latitude); //it prints here
+      setDriver({
+        longitude: parseFloat(value.longitude),
+        latitude: parseFloat(value.latitude),
+      });
     }
   };
 
@@ -170,7 +168,7 @@ const Delivery = () => {
     pickOrder();
     const timer = setInterval(() => covertDriverLocation(), 2000);
     return () => clearInterval(timer);
-  },[covertDriverLocation]);
+  }, [covertDriverLocation]);
 
   let center = {
     latitude: driver ? driver?.latitude : 0,
@@ -184,77 +182,65 @@ const Delivery = () => {
       console.debug(driver);
       ref.current?.animateCamera({ center: driver, zoom: 18 });
     }
-
   }, [driver]);
 
-
-
-
-  const pickOrder = async() => {
-   
-    let response = await fetch('https://www.sunshinedeliver.com/api/customer/order/latest/', {
-          method: 'POST',
-          headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            access_token: user?.token,
-          
-          })
+  const pickOrder = async () => {
+    let response = await fetch(
+      "https://www.sunshinedeliver.com/api/customer/order/latest/",
+      {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          access_token: user?.token,
+        }),
+      }
+    )
+      .then((response) => response.json())
+      .then((responseJson) => {
+        if (responseJson.order.total == null) {
+          alert(" Voce Nao tem nenhum Pedido a Caminho");
+          navigation.goBack();
+        } else {
+          setData(responseJson.order);
+          setDriverData(responseJson.order.driver);
+          setRestaurantData(responseJson.order.restaurant);
+          setOrderData(responseJson.order.order_details);
+        }
       })
-       .then((response) => response.json())
-       .then((responseJson) => {
-         if(responseJson.order.total==null){     
-         alert(" Voce Nao tem nenhum Pedido a Caminho")
-           navigation.goBack()
-           
-            }
-            else{
-        setData(responseJson.order);
-        setDriverData(responseJson.order.driver);
-        setRestaurantData(responseJson.order.restaurant);
-        setOrderData(responseJson.order.order_details);
-    }
-        })  
-        .catch((error) => {
-          console.error(error);
-        });
-}
+      .catch((error) => {
+        console.error(error);
+      });
+  };
 
+  const calculateTravelTime = async () => {
+    const apiKey = googleAPi;
+    const originLat = driver ? driver?.latitude : 0;
+    const originLng = driver ? driver?.longitude : 0;
+    console.log("user location", initialRegion);
+    console.log("driver location", initialCoordinate);
+    const destinationLat = userlatitude;
+    const destinationLng = userlongitude;
+    const mode = "driving";
+    const url = `https://maps.googleapis.com/maps/api/directions/json?origin=${originLat},${originLng}&destination=${destinationLat},${destinationLng}&mode=${mode}&key=${apiKey}`;
 
-const calculateTravelTime = async () => {
+    fetch(url)
+      .then((response) => response.json())
+      .then((data) => {
+        const travelTimeInSeconds = data.routes[0].legs[0].duration.value;
+        const travelTimeInMinutes = Math.ceil(travelTimeInSeconds / 60);
+        setTime(travelTimeInSeconds.toFixed(2));
+        console.log(`Travel time: ${travelTimeInMinutes} minutes`);
+      })
+      .catch((error) => console.error("No route information available."));
+  };
 
-  const apiKey = googleAPi;
-  const originLat = driver ? driver?.latitude : 0;
-  const originLng = driver ? driver?.longitude : 0;
-  console.log("driver location",driverLatitude)
-  const destinationLat = userlatitude;
-  const destinationLng = userlongitude;
-  const mode = 'driving';
-  const url = `https://maps.googleapis.com/maps/api/directions/json?origin=${originLat},${originLng}&destination=${destinationLat},${destinationLng}&mode=${mode}&key=${apiKey}`;
-  
-  fetch(url)
-    .then(response => response.json())
-    .then(data => {
-      const travelTimeInSeconds = data.routes[0].legs[0].duration.value;
-      const travelTimeInMinutes = Math.ceil(travelTimeInSeconds / 60);
-      setTime(travelTimeInSeconds.toFixed(2));
-      console.log(`Travel time: ${travelTimeInMinutes} minutes`);
-    })
-    .catch(error => console.error('No route information available.'));
-
-  
-};
-
-useEffect(() => {
-  const timer = setInterval(() => 
-  calculateTravelTime(),
-   2000);
-  return () => clearInterval(timer);
-},[calculateTravelTime]);
-
-
+  useEffect(() => {
+    const timer = setInterval(() => calculateTravelTime(), 2000);
+    return () => clearInterval(timer);
+  }, []);
 
   return (
     <Screen style={tailwind`flex-1`}>
@@ -268,15 +254,16 @@ useEffect(() => {
       <View style={tailwind`bg-white mx-5 my-2 rounded-md p-6 z-50 shadow-md`}>
         <View style={tailwind`flex-row justify-between`}>
           <View>
-            <Text style={tailwind`text-lg text-gray-400`}>
-              Estimated Arrival 
-            </Text>
-            <Text></Text>
-        
-              <Text style={tailwind`text-4xl font-bold`}>
-                Travel time: {time}
+            <TouchableOpacity onPress={userLocation}>
+              <Text style={tailwind`text-lg text-gray-400`}>
+                Estimated Arrival
               </Text>
-         
+            </TouchableOpacity>
+            <Text></Text>
+
+            <Text style={tailwind`text-4xl font-bold`}>
+              Travel time: {time}
+            </Text>
           </View>
           <Image
             source={{
@@ -288,29 +275,26 @@ useEffect(() => {
         <Progress.Bar size={30} color="#004AAD" indeterminate={true} />
       </View>
       <View style={[tailwind`bg-blue-300 relative `, { height: 500 }]}>
-      {center && (
+        {initialRegion && (
           <>
-        <MapView 
-        ref={ref}
-        region={{
-          ...center
-        }}
-        
-        style={tailwind`h-full z-10`}>
-      
-          <Marker coordinate={initialCoordinate}>
-            <Image
-              source={{
-                uri: "https://links.papareact.com/fls",
+            <MapView
+              ref={ref}
+              region={{
+                ...initialRegion,
               }}
-              style={tailwind`h-20 w-20`}
-            />
-          </Marker>
-        
-        </MapView>
-        </>
+              style={tailwind`h-full z-10`}
+            >
+              <Marker coordinate={initialCoordinate}>
+                <Image
+                  source={{
+                    uri: "https://links.papareact.com/fls",
+                  }}
+                  style={tailwind`h-20 w-20`}
+                />
+              </Marker>
+            </MapView>
+          </>
         )}
-       
       </View>
     </Screen>
   );

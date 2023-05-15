@@ -22,7 +22,7 @@ import { loginUser } from "../redux/slices/authSlice";
 
 import * as Updates from "expo-updates";
 
-export default function SignupScreen() {
+export default function SignupScreen({ navigation }: { navigation: any }) {
   const dispatch = useDispatch();
 
   const [username, setUsername] = useState("");

@@ -22,7 +22,7 @@ import tailwind from "tailwind-react-native-classnames";
 
 import * as Updates from "expo-updates";
 
-export default function LoginScreenUser() {
+export default function LoginScreenUser({ navigation }: { navigation: any }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
