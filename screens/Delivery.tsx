@@ -1,35 +1,25 @@
 import {
   View,
-  StyleSheet,
-  Dimensions,
-  Platform,
   Image,
   TouchableOpacity,
   Text,
-  Button,
 } from "react-native";
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import Screen from "../components/Screen";
 import tailwind from "tailwind-react-native-classnames";
 import { XCircleIcon } from "react-native-heroicons/outline";
 import * as Progress from "react-native-progress";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import MapView, {
   Marker,
-  PROVIDER_GOOGLE,
-  Polyline,
-  Region,
 } from "react-native-maps";
 
 import { googleAPi } from "../configs/variable";
 
 import { selectUser } from "../redux/slices/authSlice";
 
-import * as Location from "expo-location";
-import * as Device from "expo-device";
 
-import axios from "axios";
 import { selectUserLocation } from "../redux/slices/locationSlice";
 import { selectDriverLocation } from "../redux/slices/driverLocationSlice";
 
