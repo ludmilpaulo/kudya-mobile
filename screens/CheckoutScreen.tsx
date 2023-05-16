@@ -167,6 +167,7 @@ const CheckoutScreen = ({ navigation }: { navigation: any }) => {
       <Screen style={tailwind`flex-1`}>
         <GooglePlacesAutocomplete
           placeholder="Adicione seu endereço"
+      
           onPress={(data, details = null) => {
             console.log("endereco done", data?.description);
             setUserAddress(data?.description);
@@ -204,19 +205,14 @@ const CheckoutScreen = ({ navigation }: { navigation: any }) => {
           }}
         />
  <TouchableOpacity
-          style={tailwind`h-10 w-full bg-white rounded-full items-center justify-center border border-blue-500 `}
+          style={tailwind`h-10 w-full bg-blue-500 mb-24 rounded-full items-center justify-center border border-blue-500 `}
           onPress={completeOrder}
         >
-        <Text
-          style={tailwind`h-10 w-full bg-white rounded-full items-center justify-center border border-blue-500 `}
-         
-        >
- fazer o pagamento na entrega
-          </Text>
-      </TouchableOpacity>
+          <Text>Pagar na entrega </Text>
+        </TouchableOpacity>
 
         <TouchableOpacity
-          style={tailwind`h-10 w-full bg-white rounded-full items-center justify-center border border-blue-500 `}
+          style={tailwind`h-10 w-full bg-blue-500 rounded-full items-center justify-center border border-blue-500 `}
           onPress={completeOrder}
         >
           <Text>FAÇA SEU PEDIDO </Text>

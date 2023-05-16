@@ -27,6 +27,8 @@ import * as Location from "expo-location";
 import { googleAPi } from "../configs/variable";
 
 import AccountScreen from "./AccountScreen";
+import { selectUserLocation, setUserLocation } from "../redux/slices/locationSlice";
+import { selectDriverLocation, setDriverLocation } from "../redux/slices/driverLocationSlice"
 
 interface Restaurant {
   id: number;
@@ -41,10 +43,17 @@ Geocoder.init(googleAPi);
 const HomeScreen = () => {
   const user = useSelector(selectUser);
 
+  //const userPosition = useSelector(setUserLocation);
+
+
+  const driverPosition = useSelector(selectDriverLocation);
+
+
+
   const dispatch = useDispatch();
 
   const url = "https://www.sunshinedeliver.com";
-  // const [restaurantData, setRestaurantData] = useState<Restaurant[]>([]);
+
   const [search, setSearch] = useState("");
   const [address, setAddress] = useState("");
 
@@ -58,10 +67,9 @@ const HomeScreen = () => {
   const [masterDataSource, setMasterDataSource] = useState<Restaurant[]>([]);
   const [loading, setLoading] = React.useState(false);
 
-  const customer_avatar = `${userPhoto}`;
-  const customer_image = `${url}${customer_avatar}`;
-
+  
   const [currentLocation, setCurrentLocation] = useState<any>();
+  const [driverCurrentLocation, setDriverCurrentLocation] = useState<any | null>(driverPosition?.location);
 
   const pickUser = async () => {
     let response = await fetch(
@@ -86,9 +94,12 @@ const HomeScreen = () => {
       });
   };
 
-  useEffect(() => {
-    console.log("user photo", customer_image);
+  const customer_avatar = `${userPhoto}`;
+  const customer_image = `${url}${customer_avatar}`;
 
+
+  useEffect(() => {
+   
     pickUser();
     const timer = setInterval(() => userLocation(), 2000);
     return () => clearInterval(timer);
@@ -111,6 +122,27 @@ const HomeScreen = () => {
     // dispatch(setLocation(location.coords))
     // console.log(location.coords)
     setCurrentLocation(location.coords);
+    dispatch(setUserLocation({ latitude: location.coords.latitude, longitude: location.coords.longitude }));
+
+    let response = await fetch(
+      "https://www.sunshinedeliver.com/api/customer/driver/location/",
+      {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          access_token: user?.token,
+        }),
+      }
+    );
+    const locationData = await response.json();
+    dispatch(setDriverLocation(locationData));
+
+   
+
+    setDriverCurrentLocation(locationData?.location);
 
     Geocoder.from(location?.coords)
       .then((response) => {
@@ -169,6 +201,11 @@ const HomeScreen = () => {
       setSearch(text);
     }
   };
+
+ 
+
+
+
 
   return (
     <Screen style={tailwind`pt-5`}>
