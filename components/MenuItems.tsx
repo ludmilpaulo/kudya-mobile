@@ -26,11 +26,11 @@ const MenuItems = ({ resId, food, resName, resImage, foods }: Meals) => {
   const [isPressed, setIsPressed] = useState(false);
 
   const setTheQuantity = () => {
-    const resIndex = cartItems.findIndex((item) => item.resName === resName);
+    const resIndex = cartItems.findIndex((item: { resName: string; }) => item.resName === resName);
 
     if (resIndex >= 0) {
       const menuIndex = cartItems[resIndex].foods.findIndex(
-        (item) => item.id === food.id
+        (item: { id: any; }) => item.id === food.id
       );
       if (menuIndex >= 0) {
         console.log("Menu Index => ", menuIndex);
@@ -60,10 +60,10 @@ const MenuItems = ({ resId, food, resName, resImage, foods }: Meals) => {
   }
 
   const match = (id: any) => {
-    const resIndex = cartItems.findIndex((item) => item.resName === resName);
+    const resIndex = cartItems.findIndex((item: { resName: string; }) => item.resName === resName);
     if (resIndex >= 0) {
       const menuIndex = cartItems[resIndex].foods.findIndex(
-        (item) => item.id === id
+        (item: { id: any; }) => item.id === id
       );
       if (menuIndex >= 0) return true;
       return false;
@@ -72,15 +72,15 @@ const MenuItems = ({ resId, food, resName, resImage, foods }: Meals) => {
   };
 
   const handleAddRemove = (id: any) => {
-    const indexFromFood = foods.findIndex((x) => x.id === id);
-    const resIndex = cartItems.findIndex((item) => item.resName === resName);
+    const indexFromFood = foods.findIndex((x: { id: any; }) => x.id === id);
+    const resIndex = cartItems.findIndex((item: { resName: string; }) => item.resName === resName);
     const foodItem = foods[indexFromFood];
     foodItem.quantity = qty;
     console.log(foodItem);
 
     if (resIndex >= 0) {
       const menuIndex = cartItems[resIndex].foods.findIndex(
-        (item) => item.id === id
+        (item: { id: any; }) => item.id === id
       );
       if (menuIndex >= 0) {
         let oldArrays = [...cartItems];

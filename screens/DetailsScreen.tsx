@@ -28,12 +28,13 @@ import { useRoute } from "@react-navigation/native";
 import Geolocation from "react-native-geolocation-service";
 import * as Location from "expo-location";
 import Geocoder from "react-native-geocoding";
+import { googleAPi } from "../configs/variable";
 
 const DetailsScreen = (props: any) => {
   const navigation = useNavigation();
 
   const route = useRoute();
-  const item = route.params.item;
+  const item = route.params && route.params;
 
   const [foods, setFoods] = useState([{}]);
   const [categories, setCategories] = useState([{}]);
@@ -58,7 +59,7 @@ const DetailsScreen = (props: any) => {
   ///********************************* Address **************************************************/////
 
   // Initialize the module (needs to be done only once)
-  Geocoder.init("AIzaSyDn1X_BlFj-57ydasP6uZK_X_WTERNJb78"); // use a valid API key
+  Geocoder.init(googleAPi); // use a valid API key
   // With more options
   // Geocoder.init("xxxxxxxxxxxxxxxxxxxxxxxxx", {language : "en"}); // set the language
 

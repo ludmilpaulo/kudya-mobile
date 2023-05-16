@@ -9,8 +9,6 @@ import {
   Platform,
 } from "react-native";
 import {
-  ChevronDownIcon,
-  UserIcon,
   AdjustmentsVerticalIcon,
   MagnifyingGlassIcon,
 } from "react-native-heroicons/outline";
@@ -26,8 +24,7 @@ import * as Location from "expo-location";
 
 import { googleAPi } from "../configs/variable";
 
-import AccountScreen from "./AccountScreen";
-import { selectUserLocation, setUserLocation } from "../redux/slices/locationSlice";
+import { setUserLocation } from "../redux/slices/locationSlice";
 import { selectDriverLocation, setDriverLocation } from "../redux/slices/driverLocationSlice"
 
 interface Restaurant {

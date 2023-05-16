@@ -8,9 +8,9 @@
     <true/>
     <key>EXUpdatesLaunchWaitMs</key>
     <integer>0</integer>
-    <key>EXUpdatesSDKVersion</key>
-    <string>48.0.0</string>
     <key>EXUpdatesURL</key>
-    <string>https://exp.host/@ludmil/kudya-mobile</string>
+    <string>https://u.expo.dev/310d9e3d-aa61-4e69-830d-0f0826cef607</string>
+    <key>EXUpdatesRuntimeVersion</key>
+    <string>1.0.0</string>
   </dict>
 </plist>
