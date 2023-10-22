@@ -1,14 +1,16 @@
 import { configureStore } from "@reduxjs/toolkit";
 import authReducer from "./slices/authSlice";
-import busketReducer from "./slices/basketSlice";
+import basketReducer from "./slices/basketSlice"; // Fixed the typo here
 import locationSlice from "./slices/locationSlice";
 import driverLocationSlice from "./slices/driverLocationSlice";
+import restaurantReducer from "./slices/restaurantSlice";
 
 export const store = configureStore({
   reducer: {
-    busket: busketReducer,
+    basket: basketReducer, // Use "basket" instead of "busket"
     auth: authReducer,
     location: locationSlice,
-    driverLocation : driverLocationSlice,
+    driverLocation: driverLocationSlice,
+    restaurant: restaurantReducer,
   },
 });

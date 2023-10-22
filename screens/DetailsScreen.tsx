@@ -16,10 +16,7 @@ import { Entypo } from "@expo/vector-icons";
 import RestaurantMap from "../components/RestaurantMap";
 import MenuItems from "../components/MenuItems";
 import ViewCart from "../components/ViewCart";
-import {
-  selectTotalItems,
-  selectTotalPrice,
-} from "../redux/slices/basketSlice";
+
 import { useSelector } from "react-redux";
 
 import { useNavigation } from "@react-navigation/native";
@@ -28,7 +25,8 @@ import { useRoute } from "@react-navigation/native";
 import Geolocation from "react-native-geolocation-service";
 import * as Location from "expo-location";
 import Geocoder from "react-native-geocoding";
-import { googleAPi } from "../configs/variable";
+import { fetchData, googleAPi } from "../configs/variable";
+import BasketIcon from "../components/BasketIcon";
 
 const DetailsScreen = (props: any) => {
   const navigation = useNavigation();
@@ -41,8 +39,7 @@ const DetailsScreen = (props: any) => {
   const [quantity, setquantity] = useState(1);
   const [mapActive, setMapActive] = useState(false);
 
-  const totalPrice = useSelector(selectTotalPrice);
-  const getAllItems = useSelector(selectTotalItems);
+
 
   const { restaurantId, image_url, name, address, phone, review_count } =
     props.route.params;
@@ -55,6 +52,23 @@ const DetailsScreen = (props: any) => {
     latitude: restlatitude,
     longitude: restlongitude,
   };
+
+  useEffect(() => {
+    const fetchMenuData = async () => {
+      try {
+        const data = await fetchData(`/api/customer/meals/${restaurantId}/`);
+        setFoods(data.meals);
+        setCategories(data.meals);
+        console.log("api data", data);
+       
+      } catch (error) {
+        // Handle error
+        console.error('Error:', error);
+      }
+    };
+
+    fetchMenuData();
+  }, []);
 
   ///********************************* Address **************************************************/////
 
@@ -72,20 +86,11 @@ const DetailsScreen = (props: any) => {
     })
     .catch((error) => console.warn(error));
 
-  useEffect(() => {
-    fetch(`https://www.sunshinedeliver.com/api/customer/meals/${restaurantId}/`)
-      .then((response) => response.json())
-      .then((responseJson) => {
-        setFoods(responseJson.meals);
-        setCategories(responseJson.meals);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  }, []);
+ 
 
   return (
     <>
+   
       <View style={styles.container}>
         <TouchableOpacity
           style={tailwind`absolute top-9 left-4 z-30 w-9 h-9 rounded-full bg-white justify-center items-center shadow`}
@@ -136,7 +141,7 @@ const DetailsScreen = (props: any) => {
             {foods?.map((food) => {
               return (
                 <MenuItems
-                  key={food.id}
+                  key={food?.id}
                   resId={restaurantId}
                   foods={foods}
                   food={food}
@@ -154,8 +159,9 @@ const DetailsScreen = (props: any) => {
             })}
           </View>
         </ScrollView>
-        <ViewCart total={totalPrice} count={getAllItems.length} />
+        
       </View>
+      <ViewCart />
     </>
   );
 };

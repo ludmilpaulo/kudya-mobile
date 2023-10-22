@@ -1,219 +1,83 @@
-import React, { useState, useEffect, useMemo } from "react";
-import { View, StyleSheet, Text, Image, TouchableOpacity } from "react-native";
-//import { foods } from '../data/foodsData'
-import tailwind from "tailwind-react-native-classnames";
+import React, { useState } from "react";
+import { View, Text, Image, TouchableOpacity } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
-import { selectCartItems, updateBusket } from "../redux/slices/basketSlice";
-import BouncyCheckbox from "react-native-bouncy-checkbox";
-import colors from "../configs/colors";
+import tailwind from "tailwind-react-native-classnames";
+import Currency from "react-currency-formatter";
+import { addToBasket, removeFromBasket, selectBasketItemsWithId } from "../redux/slices/basketSlice";
+import { MinusCircleIcon, PlusCircleIcon } from "react-native-heroicons/outline";
 
 interface Meals {
-  foods: any;
-  food: any;
-  resImage: string;
-  resName: string;
-  resId: number;
-  category: string;
-  id: number;
-  image: string;
-  name: string;
-  price: number;
-  quantity: number;
-  short_description: string;
+  food: {
+    id: number;
+    name: string;
+    short_description: string;
+    price: number;
+    image: string;
+  };
 }
 
-const MenuItems = ({ resId, food, resName, resImage, foods }: Meals) => {
+const MenuItems: React.FC<Meals> = ({ food }) => {
   const [isPressed, setIsPressed] = useState(false);
-
-  const setTheQuantity = () => {
-    const resIndex = cartItems.findIndex((item: { resName: string; }) => item.resName === resName);
-
-    if (resIndex >= 0) {
-      const menuIndex = cartItems[resIndex].foods.findIndex(
-        (item: { id: any; }) => item.id === food.id
-      );
-      if (menuIndex >= 0) {
-        console.log("Menu Index => ", menuIndex);
-        const menuItem = cartItems[resIndex].foods[menuIndex];
-        console.log("Menu Item => ", menuItem);
-        setQty(menuItem.quantity);
-      }
-    }
-  };
-
-  useEffect(() => {
-    setTheQuantity();
-  }, []);
-  const [qty, setQty] = useState(0);
-  const [restaurantId, setRestaurantId] = useState(resId);
-  const cartItems = useSelector(selectCartItems);
   const dispatch = useDispatch();
+  const { id, name, short_description, price, image } = food;
 
-  function quantityUp() {
-    setQty(qty + 1);
-  }
+  const items = useSelector((state: any) => selectBasketItemsWithId(state, id));
 
-  function quantityDown() {
-    if (qty != 0) {
-      setQty(qty - 1);
-    }
-  }
-
-  const match = (id: any) => {
-    const resIndex = cartItems.findIndex((item: { resName: string; }) => item.resName === resName);
-    if (resIndex >= 0) {
-      const menuIndex = cartItems[resIndex].foods.findIndex(
-        (item: { id: any; }) => item.id === id
-      );
-      if (menuIndex >= 0) return true;
-      return false;
-    }
-    return false;
+  const addItemToBasket = () => {
+    dispatch(addToBasket({ id, name, short_description, price, image }));
   };
 
-  const handleAddRemove = (id: any) => {
-    const indexFromFood = foods.findIndex((x: { id: any; }) => x.id === id);
-    const resIndex = cartItems.findIndex((item: { resName: string; }) => item.resName === resName);
-    const foodItem = foods[indexFromFood];
-    foodItem.quantity = qty;
-    console.log(foodItem);
-
-    if (resIndex >= 0) {
-      const menuIndex = cartItems[resIndex].foods.findIndex(
-        (item: { id: any; }) => item.id === id
-      );
-      if (menuIndex >= 0) {
-        let oldArrays = [...cartItems];
-        let oldfoods = [...oldArrays[resIndex].foods];
-        oldfoods.splice(menuIndex, 1);
-        oldArrays.splice(resIndex, 1);
-        let newArray = [
-          ...oldArrays,
-          { foods: oldfoods, resName, resImage, resId },
-        ];
-        dispatch(updateBusket(newArray));
-      } else {
-        let oldArrays = [...cartItems];
-        let newFoodArray = [...oldArrays[resIndex].foods, foodItem];
-        oldArrays.splice(resIndex, 1);
-        let updatedResArray = [
-          ...oldArrays,
-          { foods: newFoodArray, resName, resImage, resId },
-        ];
-        dispatch(updateBusket(updatedResArray));
-      }
-    } else {
-      let oldArrays = [...cartItems];
-      let newResFoodArray = [
-        ...oldArrays,
-        {
-          foods: [{ ...foodItem }],
-          resName,
-          resImage,
-          resId,
-        },
-      ];
-      dispatch(updateBusket(newResFoodArray));
+  const removeItemFromBasket = () => {
+    if (items.length > 0) {
+      dispatch(removeFromBasket(id));
     }
   };
-
+  
   return (
     <>
-      <View style={tailwind`mt-5 mb-12`}>
-        <View
-          style={tailwind`mb-3 flex-row justify-between items-center pb-3 border-b border-gray-100`}
-        >
-          <View style={tailwind`flex-1 pr-3 flex-row items-center`}>
-            <View style={tailwind`flex-1 pl-2`}>
-              <Text
-                style={[
-                  tailwind`text-gray-900 font-bold mb-1`,
-                  { fontSize: 16 },
-                ]}
-              >
-                {food.name}
-              </Text>
-              <Text style={tailwind`text-gray-800 text-xs`}>
-                {food.price},Kz
-              </Text>
-              <Text style={tailwind`text-gray-600 text-xs`}>
-                {food.short_description}
-              </Text>
-            </View>
-
-            <View
-              style={{
-                borderRadius: 5,
-                borderWidth: 2,
-                borderColor: colors.gray,
-                width: 96,
-                height: 35,
-                flexDirection: "row",
-                justifyContent: "space-between",
-                alignItems: "center",
-              }}
-            >
-              <TouchableOpacity
-                style={{
-                  width: 32,
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-                onPress={() => quantityDown()}
-              >
-                <Text style={{ fontSize: 20, fontWeight: "bold" }}>-</Text>
-              </TouchableOpacity>
-
-              <Text style={{ fontSize: 16, fontWeight: "bold" }}>{qty}</Text>
-
-              <TouchableOpacity
-                style={{
-                  width: 32,
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-                onPress={() => quantityUp()}
-              >
-                <Text style={{ fontSize: 20, fontWeight: "bold" }}>+</Text>
-              </TouchableOpacity>
-            </View>
+      <TouchableOpacity
+        onPress={() => setIsPressed(!isPressed)}
+        style={tailwind`bg-white border p-4 border-gray-200`}
+      >
+        <View style={tailwind`flex-row`}>
+          <View style={tailwind`flex-1 pr-2`}>
+            <Text style={tailwind`mb-1 text-lg`}>{food.name}</Text>
+            <Text style={tailwind`text-gray-400`}>{food.short_description}</Text>
+            <Text style={tailwind`mt-2 text-gray-400`}>
+            {food.price !== undefined ? (
+    <Currency quantity={food.price} currency="ZAR" />
+  ) : null}
+            </Text>
           </View>
-          <View style={tailwind``}>
+          <View>
             <Image
-              style={tailwind`h-16 w-16 rounded-lg`}
+              style={{
+                borderWidth: 1,
+                borderColor: "#F3F3F4",
+                height: 100, // Adjust the size as needed
+                width: 100,  // Adjust the size as needed
+              }}
               source={{ uri: food.image }}
             />
           </View>
         </View>
+      </TouchableOpacity>
 
-        {qty > 0 && (
-          <>
-            {match(food.id) ? (
-              <TouchableOpacity
-                onPress={() => handleAddRemove(food.id)}
-                style={tailwind`bg-black absolute bottom-1 self-center py-1 px-12 rounded-full z-50`}
-              >
-                <Text style={tailwind`text-white text-sm`}>
-                  Remover da Bandeja
-                </Text>
-              </TouchableOpacity>
-            ) : (
-              <TouchableOpacity
-                onPress={() => handleAddRemove(food.id)}
-                style={tailwind`bg-black absolute bottom-1 self-center py-1 px-12 rounded-full z-50`}
-              >
-                <Text style={tailwind`text-white text-sm`}>
-                  Adicionar na Bandeja
-                </Text>
-              </TouchableOpacity>
-            )}
-          </>
-        )}
-      </View>
+      {isPressed && (
+        <View style={tailwind`px-4 bg-white`}>
+          <View style={tailwind`flex-row items-center pb-3 space-x-2`}>
+            <TouchableOpacity disabled={!items.length} onPress={removeItemFromBasket}>
+              <MinusCircleIcon color={items.length > 0 ? "#00CCBB" : "gray"} size={40} />
+            </TouchableOpacity>
+            <Text>{items.length}</Text>
+            <TouchableOpacity onPress={addItemToBasket}>
+              <PlusCircleIcon color="#00CCBB" size={40} />
+            </TouchableOpacity>
+          </View>
+        </View>
+      )}
     </>
   );
 };
-
-const styles = StyleSheet.create({});
 
 export default MenuItems;
