@@ -1,9 +1,4 @@
-import {
-  View,
-  Image,
-  TouchableOpacity,
-  Text,
-} from "react-native";
+import { View, Image, TouchableOpacity, Text } from "react-native";
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import Screen from "../components/Screen";
@@ -11,14 +6,11 @@ import tailwind from "tailwind-react-native-classnames";
 import { XCircleIcon } from "react-native-heroicons/outline";
 import * as Progress from "react-native-progress";
 import { useSelector } from "react-redux";
-import MapView, {
-  Marker,
-} from "react-native-maps";
+import MapView, { Marker } from "react-native-maps";
 
 import { googleAPi } from "../configs/variable";
 
 import { selectUser } from "../redux/slices/authSlice";
-
 
 import { selectUserLocation } from "../redux/slices/locationSlice";
 import { selectDriverLocation } from "../redux/slices/driverLocationSlice";
@@ -41,13 +33,12 @@ const Delivery = () => {
   const [deliveryPoints, setDeliveryPoints] = useState();
 
   const [driverLocation, setDriverLocation] = useState();
- 
+
   const [userlongitude, setUserLongitude] = useState(0);
   const [userlatitude, setUserLatitude] = useState(0);
 
   const [driverLongitude, setDriverLong] = useState(0);
   const [driverLatitude, setDriverLat] = useState(0);
-
 
   const [data, setData] = useState([{}]);
   const [driverData, setDriverData] = useState({});
@@ -58,46 +49,24 @@ const Delivery = () => {
   const userPosition = useSelector(selectUserLocation);
 
   const locationObject = JSON.parse(driverPosition.location.replace(/'/g, '"'));
-  
-  
-
-  
 
   const GOOGLE_MAPS_APIKEY = googleAPi;
 
-
-
   const initialRegion = {
-    latitude:userPosition.latitude,
+    latitude: userPosition.latitude,
     longitude: userPosition.longitude,
     latitudeDelta: 0.005,
     longitudeDelta: 0.005,
   };
 
- 
-
-
-  
   const [travelTime, setTravelTime] = useState<number | null>(null);
 
-
-  
-
-  
-
   useEffect(() => {
-
-    
-    
     pickOrder();
-    const timer = setInterval(() => 
-   
-    
-    2000);
+    const timer = setInterval(() => 2000);
     return () => clearInterval(timer);
   }, []);
 
-  
   useEffect(() => {
     if (locationObject) {
       console.debug(locationObject);
@@ -177,11 +146,10 @@ const Delivery = () => {
       <View style={tailwind`bg-white mx-5 my-2 rounded-md p-6 z-50 shadow-md`}>
         <View style={tailwind`flex-row justify-between`}>
           <View>
-           
-              <Text style={tailwind`text-lg text-gray-400`}>
-                Estimated Arrival
-              </Text>
-            
+            <Text style={tailwind`text-lg text-gray-400`}>
+              Estimated Arrival
+            </Text>
+
             <Text></Text>
 
             <Text style={tailwind`text-4xl font-bold`}>

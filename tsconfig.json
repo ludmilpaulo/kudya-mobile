@@ -1,6 +1,6 @@
 {
   "extends": "expo/tsconfig.base",
-// "extends": "./path/to/expo/tsconfig.base",
+  // "extends": "./path/to/expo/tsconfig.base",
   "compilerOptions": {
     "types": ["react-native-vector-icons"],
     "jsx": "react",

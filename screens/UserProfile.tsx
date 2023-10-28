@@ -38,8 +38,7 @@ import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplet
 import Geocoder from "react-native-geocoding";
 import * as Device from "expo-device";
 import * as Location from "expo-location";
-import { Camera } from 'expo-camera';
-
+import { Camera } from "expo-camera";
 
 type ImageInfo = {
   uri: string;
@@ -62,8 +61,7 @@ const UserProfile = () => {
   const [first_name, setFirst_name] = useState("");
   const [last_name, setLast_name] = useState("");
 
-  const [location, setLocation] = useState('');
-
+  const [location, setLocation] = useState("");
 
   const [Type, setType] = useState("");
 
@@ -86,7 +84,7 @@ const UserProfile = () => {
 
     let location = await Location.getCurrentPositionAsync({});
     // dispatch(setLocation(location.coords))
-     console.log(location.coords)
+    console.log(location.coords);
 
     Geocoder.from(location?.coords)
       .then((response) => {
@@ -98,11 +96,9 @@ const UserProfile = () => {
       });
   };
 
-
   useEffect(() => {
-
     userLocation();
-   
+
     const showSubscription = Keyboard.addListener("keyboardDidShow", () => {
       setKeyboardStatus("Keyboard Shown");
     });
@@ -120,7 +116,7 @@ const UserProfile = () => {
 
   const handleTakePhoto = async () => {
     const { status } = await Permissions.askAsync(Permissions.CAMERA);
-   //let { status } = await Camera.requestPermissionsAsync();
+    //let { status } = await Camera.requestPermissionsAsync();
     if (status !== "granted") {
       alert("Permission to access camera denied");
       return;
@@ -153,9 +149,6 @@ const UserProfile = () => {
   };
 
   const userUpdate = async () => {
-    
-  
-
     // ImagePicker saves the taken photo to disk and returns a local URI to it
     if (!imageInfo) {
       alert("Please select an image first");
@@ -175,37 +168,37 @@ const UserProfile = () => {
 
     console.log("shool ==>", formData);
 
-   // try {
-      let response = await fetch(
-        "https://www.sunshinedeliver.com/api/customer/profile/update/",
-        {
-          method: "POST",
-          headers: {
-            Accept: "application/json",
-            "Content-Type": "multipart/form-data",
-          },
-          body: formData,
-        }
-      );
-      //response = await response.json();
-
-      if (response.status == 200) {
-        let data = await response.json();
-
-        alert(data.status);
-        navigation.navigate("HomeScreen");
-        return true;
-      } else {
-        let resp = await response.json();
-        alert("" + resp.non_field_errors);
-        console.log("err", resp);
+    // try {
+    let response = await fetch(
+      "https://www.sunshinedeliver.com/api/customer/profile/update/",
+      {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "multipart/form-data",
+        },
+        body: formData,
       }
-  //  } catch (e) {
+    );
+    //response = await response.json();
+
+    if (response.status == 200) {
+      let data = await response.json();
+
+      alert(data.status);
+      navigation.navigate("HomeScreen");
+      return true;
+    } else {
+      let resp = await response.json();
+      alert("" + resp.non_field_errors);
+      console.log("err", resp);
+    }
+    //  } catch (e) {
     //  console.log("alila", e);
-     // alert("O usuário não existe, inscreva-se ou tente fazer login novamente");
-    
-      Updates.reloadAsync();
-  //  }
+    // alert("O usuário não existe, inscreva-se ou tente fazer login novamente");
+
+    Updates.reloadAsync();
+    //  }
   };
 
   return (
@@ -230,11 +223,7 @@ const UserProfile = () => {
           </View>
 
           <View>
-
-         
-
             <View>
-
               <TextInput
                 style={styles.input}
                 placeholder="Primeiro Nome"
@@ -251,8 +240,6 @@ const UserProfile = () => {
                 autoCapitalize={"none"}
                 onSubmitEditing={Keyboard.dismiss}
               />
-             
-            
 
               <TextInput
                 style={styles.input}
@@ -272,7 +259,6 @@ const UserProfile = () => {
               <Text style={styles.vamosJuntos}>Atualize seu Perfil</Text>
             </TouchableOpacity>
           </View>
-          
         </View>
       </Screen>
     </>
@@ -367,7 +353,7 @@ const styles = StyleSheet.create({
   },
   containertext: {
     width: 159,
-   // height: 42,
+    // height: 42,
   },
   vamosJuntos: {
     color: colors.white,
@@ -375,7 +361,6 @@ const styles = StyleSheet.create({
     // textTransform: 'uppercase',
     fontWeight: "700",
   },
- 
 });
 
 export default UserProfile;

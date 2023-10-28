@@ -1,26 +1,38 @@
 import React from "react";
-import { StyleSheet, View, Image, Text } from "react-native";
+import { View, Image, Text } from "react-native";
 import tailwind from "tailwind-react-native-classnames";
-import colors from "../configs/colors";
 import AppButton from "../components/AppButton";
 import Screen from "../components/Screen";
+import { StackNavigationProp } from "@react-navigation/stack"; // Import the necessary type
 
-function JoinScreen({ navigation }: { navigation: any }) {
+type JoinScreenProps = {
+  navigation: StackNavigationProp<{}>; // Define the type for the navigation prop
+};
+
+function JoinScreen({ navigation }: JoinScreenProps) {
   return (
     <Screen style={tailwind`flex-1`}>
-      <View style={styles.container}>
-        <View style={styles.image}>
-          <Image style={styles.logo} source={require("../assets/logo.png")} />
-          <View style={styles.content}>
-            <Text style={styles.title}>SD Food: Entrega de alimentos</Text>
-            <Text style={styles.subTitle}>
+      <View style={tailwind`flex-1`}>
+        <View style={tailwind`flex-1 justify-center items-center`}>
+          <Image
+            source={require("../assets/logo.png")}
+            style={tailwind`h-64 w-64 object-contain z-10`}
+          />
+        </View>
+
+        <View style={tailwind`flex-1 justify-end`}>
+          <View style={tailwind`bg-white px-5 pb-5 pt-6 rounded-t-2xl`}>
+            <Text style={tailwind`text-2xl font-bold mb-3`}>
+              SD Food: Entrega de alimentos
+            </Text>
+            <Text style={tailwind`text-base text-gray-500 mb-3`}>
               Receba comida à sua porta de milhares de restaurantes locais e
               nacionais incríveis.
             </Text>
             <AppButton
               title="Let's go"
-              onPress={() => navigation.navigate("UserLogin")}
-              color={"primary"}
+              onPress={() => (navigation as any).navigate("UserLogin")}
+              color="primary"
               disabled={false}
             />
           </View>
@@ -29,54 +41,5 @@ function JoinScreen({ navigation }: { navigation: any }) {
     </Screen>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  logo: {
-    height: 200,
-    resizeMode: "contain",
-    alignSelf: "center",
-    position: "absolute",
-    zIndex: 99999,
-    top: 160,
-  },
-  image: {
-    width: "100%",
-    resizeMode: "contain",
-    flex: 1,
-    position: "relative",
-    justifyContent: "flex-end",
-    // backgroundColor: colors.light
-  },
-  content: {
-    backgroundColor: colors.white,
-    paddingHorizontal: 25,
-    paddingBottom: 25,
-    paddingTop: 35,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: "700",
-    marginBottom: 10,
-  },
-  subTitle: {
-    fontSize: 16,
-    color: colors.gray,
-    marginBottom: 10,
-  },
-  input: {
-    borderColor: colors.medium,
-    backgroundColor: colors.light,
-    borderWidth: 1,
-    paddingHorizontal: 20,
-    paddingVertical: 15,
-    borderRadius: 10,
-    marginTop: 15,
-  },
-});
 
 export default JoinScreen;

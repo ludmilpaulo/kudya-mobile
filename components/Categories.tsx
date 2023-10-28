@@ -1,16 +1,16 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
+import { StyleSheet, Text, View } from "react-native";
+import React from "react";
 
-type Props = {}
+type Props = {};
 
 const Categories = (props: Props) => {
   return (
     <View>
       <Text>Categories</Text>
     </View>
-  )
-}
+  );
+};
 
-export default Categories
+export default Categories;
 
-const styles = StyleSheet.create({})
+const styles = StyleSheet.create({});

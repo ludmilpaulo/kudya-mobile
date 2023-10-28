@@ -1,29 +1,29 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface DriverLocationState {
   location: any | null;
- // longitude: number | null;
+  // longitude: number | null;
 }
 
 const initialState: DriverLocationState = {
   location: null,
- // longitude: null,
+  // longitude: null,
 };
 
 const driverLocationSlice = createSlice({
-  name: 'driverLocation',
+  name: "driverLocation",
   initialState,
   reducers: {
-    setDriverLocation: (state, action: PayloadAction<{ location: any}>) => {
+    setDriverLocation: (state, action: PayloadAction<{ location: any }>) => {
       state.location = action.payload.location;
-    //  state.longitude = action.payload.longitude;
+      //  state.longitude = action.payload.longitude;
     },
   },
 });
 
 export const { setDriverLocation } = driverLocationSlice.actions;
 
-export const selectDriverLocation = (state: { driverLocation: any; }) => state.driverLocation;
+export const selectDriverLocation = (state: { driverLocation: any }) =>
+  state.driverLocation;
 
 export default driverLocationSlice.reducer;

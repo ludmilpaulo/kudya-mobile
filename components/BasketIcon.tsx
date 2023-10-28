@@ -1,7 +1,10 @@
 import { View, Text, TouchableOpacity } from "react-native";
 import React from "react";
 import { useSelector } from "react-redux";
-import { selectBasketItems, selectBasketTotal } from "../redux/slices/basketSlice";
+import {
+  selectBasketItems,
+  selectBasketTotal,
+} from "../redux/slices/basketSlice";
 import { useNavigation } from "@react-navigation/native";
 import tailwind from "tailwind-react-native-classnames";
 import Currency from "react-currency-formatter";
@@ -19,10 +22,14 @@ const BasketIcon = () => {
         onPress={() => navigation.navigate("Cart")}
         style={tailwind`bg-black w-full  absolute bottom-4 self-center rounded-full z-50`}
       >
-        <Text style={tailwind`"text-white font-extrabold text-lg bg-[##004AAD] py-1 px-2`}>
+        <Text
+          style={tailwind`"text-white font-extrabold text-lg bg-[##004AAD] py-1 px-2`}
+        >
           {items.length}
         </Text>
-        <Text style={tailwind`flex-1 text-lg font-extrabold text-center text-white`}>
+        <Text
+          style={tailwind`flex-1 text-lg font-extrabold text-center text-white`}
+        >
           View Basket
         </Text>
         <Text style={tailwind`text-lg font-extrabold text-white`}>
