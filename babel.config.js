@@ -10,7 +10,7 @@ module.exports = function (api) {
       ],
      // 'module:metro-react-native-babel-preset',
       // Add the following preset for web support
-      'babel-preset-expo',
+     // 'babel-preset-expo',
     ],
     plugins: [
       [
@@ -20,7 +20,7 @@ module.exports = function (api) {
         },
       ],
       'react-native-reanimated/plugin',
-      'tailwindcss-react-native/babel',
+     // 'tailwindcss-react-native/babel',
     ],
   };
 };
