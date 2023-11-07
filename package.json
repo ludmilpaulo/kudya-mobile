@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@expo/eas-build-job": "^1.0.12",
+    "@expo/webpack-config": "^18.0.1",
     "@paypayopa/paypayopa-sdk-node": "^2.1.0",
     "@react-native-community/geolocation": "^3.0.6",
     "@react-native-maps/polyline-direction": "*",

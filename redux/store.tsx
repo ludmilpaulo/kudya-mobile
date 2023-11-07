@@ -1,14 +1,11 @@
-import { configureStore } from "@reduxjs/toolkit";
-import authReducer from "./slices/authSlice";
-import busketReducer from "./slices/basketSlice";
-import locationSlice from "./slices/locationSlice";
-import driverLocationSlice from "./slices/driverLocationSlice";
+// store.js
+import { configureStore } from '@reduxjs/toolkit';
+import rootReducer from './reducers'; // Import your combined reducers
 
-export const store = configureStore({
-  reducer: {
-    busket: busketReducer,
-    auth: authReducer,
-    location: locationSlice,
-    driverLocation : driverLocationSlice,
-  },
+const store = configureStore({
+  reducer: rootReducer,
 });
+
+export default store;
+
+export type AppDispatch = typeof store.dispatch;

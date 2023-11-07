@@ -2,6 +2,7 @@
   "extends": "expo/tsconfig.base",
   // "extends": "./path/to/expo/tsconfig.base",
   "compilerOptions": {
+    "esModuleInterop": true,
     "types": ["react-native-vector-icons"],
     "jsx": "react",
     "strict": true

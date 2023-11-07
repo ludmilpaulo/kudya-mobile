@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-interface DriverLocationState {
+export interface DriverLocationState {
   location: any | null;
   // longitude: number | null;
 }

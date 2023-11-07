@@ -5,29 +5,36 @@ import tailwind from "tailwind-react-native-classnames";
 import AppHead from "../components/AppHead";
 import AppButton from "../components/AppButton";
 import {
-  selectTotalItems,
-  selectTotalPrice,
+  selectBasketItems,
 } from "../redux/slices/basketSlice";
 import { useSelector } from "react-redux";
 import colors from "../configs/colors";
 import CartItems from "../components/CartItems";
 import CheckoutModal from "../components/CheckoutModal";
+import { RootState } from "../redux/types";
 
 const CartScreen = () => {
-  const totalPrice = useSelector(selectTotalPrice);
-  const getAllItems = useSelector(selectTotalItems);
+ 
+  const items = useSelector((state: RootState) => selectBasketItems(state));
+  const totalPrice = items.reduce(
+    (total, item) => total + item.price * item.quantity,
+    0
+  );
+  const getAllItems = items.length;
+
+
   const [modalVisible, setModalVisible] = useState(false);
 
   return (
     <Screen style={tailwind`flex-1`}>
       <AppHead
-        title={`Sua Bandeja (${getAllItems.length})`}
+        title={`Sua Bandeja (${getAllItems})`}
         icon="basket-outline"
       />
       <View style={tailwind`flex-1`}>
         <CartItems />
       </View>
-      {!!getAllItems.length && (
+      {!!getAllItems && (
         <View style={tailwind`flex-row items-center px-5 pb-5`}>
           <View style={styles.left}>
             <Text style={styles.total}>Total</Text>

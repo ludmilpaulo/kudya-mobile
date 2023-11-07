@@ -17,6 +17,7 @@ import RestaurantMap from "../components/RestaurantMap";
 import MenuItems from "../components/MenuItems";
 import ViewCart from "../components/ViewCart";
 import {
+  selectBasketItems,
   selectTotalItems,
   selectTotalPrice,
 } from "../redux/slices/basketSlice";
@@ -29,6 +30,8 @@ import Geolocation from "react-native-geolocation-service";
 import * as Location from "expo-location";
 import Geocoder from "react-native-geocoding";
 import { googleAPi } from "../configs/variable";
+import { Meals } from "../configs/types";
+import { RootState } from "../redux/types";
 
 const DetailsScreen = (props: any) => {
 
@@ -38,13 +41,21 @@ const DetailsScreen = (props: any) => {
   const route = useRoute();
   const item = route.params && route.params;
 
-  const [foods, setFoods] = useState([{}]);
+  const [foods, setFoods] = useState<Meals[]>([]);
   const [categories, setCategories] = useState([{}]);
   const [quantity, setquantity] = useState(1);
   const [mapActive, setMapActive] = useState(false);
 
-  const totalPrice = useSelector(selectTotalPrice);
-  const getAllItems = useSelector(selectTotalItems);
+  const items = useSelector((state: RootState) => selectBasketItems(state));
+  // Calculate total price and count of items
+  const totalPrice = items.reduce(
+    (total, item) => total + item.price * item.quantity,
+    0
+  );
+  const count = items.length;
+
+  //const totalPrice = useSelector(selectTotalPrice);
+ // const getAllItems = useSelector(selectTotalItems);
 
   const { restaurantId, image_url, name, address, phone, review_count } =
     props.route.params;
@@ -85,6 +96,8 @@ const DetailsScreen = (props: any) => {
         console.error(error);
       });
   }, []);
+
+  
 
   return (
     <>
@@ -135,28 +148,21 @@ const DetailsScreen = (props: any) => {
               </View>
             </View>
 
-            {foods?.map((food) => {
-              return (
+            {foods?.map((food) => (
                 <MenuItems
-                  key={food.id}
-                  resId={restaurantId}
-                  foods={foods}
-                  food={food}
-                  resName={name}
-                  resImage={image_url}
-                  category={""}
-                  id={0}
-                  image={""}
-                  name={""}
-                  price={0}
-                  quantity={0}
-                  short_description={""}
+                key={food.id}
+                resId={restaurantId}
+                food={food}
+                resName={name}
+                resImage={image_url} id={0} name={""} price={0} short_description={""} image={""}                 // foods={foods}
                 />
-              );
-            })}
+              ))}
+
           </View>
         </ScrollView>
-        <ViewCart total={totalPrice} count={getAllItems.length} />
+       
+        <ViewCart total={totalPrice} count={count} />
+       
       </View>
     </>
   );
